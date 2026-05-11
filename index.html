@@ -51,11 +51,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0c0e;font-family:
 
 /* FRACTURE FLASH */
 #flash{position:fixed;inset:0;z-index:300;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s}
+
+/* VR MODE */
+#vrBtn{position:absolute;bottom:16px;right:16px;pointer-events:all;background:rgba(10,12,14,.88);border:1px solid var(--border);border-radius:8px;padding:7px 13px;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.07em;transition:all .15s;display:flex;align-items:center;gap:6px;z-index:150}
+#vrBtn:hover{color:var(--text);border-color:var(--muted)}
+#vrBtn.active{color:#a8c8e8;border-color:rgba(168,200,232,.5);background:rgba(168,200,232,.08)}
+#vrSep{position:fixed;top:0;left:50%;width:2px;height:100%;background:#000;z-index:50;display:none;pointer-events:none}
+#vrBarrel{position:fixed;inset:0;z-index:48;pointer-events:none;display:none}
+/* Barrel distortion via radial gradient vignettes on each eye */
+#vrBarrel::before,#vrBarrel::after{content:'';position:absolute;top:0;bottom:0;width:50%;background:radial-gradient(ellipse 85% 90% at center,transparent 60%,rgba(0,0,0,.85) 100%)}
+#vrBarrel::before{left:0}
+#vrBarrel::after{right:0}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="flash"></div>
+<div id="vrSep"></div>
+<div id="vrBarrel"></div>
 
 <div id="hud">
   <div class="htl">
@@ -71,6 +84,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0c0e;font-family:
     <canvas id="hc" width="180" height="80"></canvas>
   </div>
   <button class="hbk" id="hbk">← back to menu</button>
+  <button id="vrBtn">📦 VR Mode</button>
   <div class="hpw"><div id="pgb"></div></div>
 </div>
 
@@ -105,6 +119,12 @@ var debrisList   = [];   // fracture debris pieces
 var fractured    = false;
 
 // ═══════════════════════════════════════════════════════
+// VR / CARDBOARD STATE
+// ═══════════════════════════════════════════════════════
+var vrMode = false;
+var EYE_SEPARATION = 0.032; // half-IPD in world units (~64mm)
+
+// ═══════════════════════════════════════════════════════
 // RENDERER + SCENE + CAMERA
 // ═══════════════════════════════════════════════════════
 var canvas   = document.getElementById('c');
@@ -115,13 +135,36 @@ renderer.setClearColor(0x0a0c0e);
 renderer.shadowMap.enabled = false;
 
 var scene  = new THREE.Scene();
+// Main (center/mono) camera
 var camera = new THREE.PerspectiveCamera(80, window.innerWidth/window.innerHeight, 0.1, 600);
 camera.position.set(0, 2, 0);
+
+// Left & right eye cameras (children of camera so they inherit its transform)
+var camL = new THREE.PerspectiveCamera(80, 0.5*window.innerWidth/window.innerHeight, 0.1, 600);
+var camR = new THREE.PerspectiveCamera(80, 0.5*window.innerWidth/window.innerHeight, 0.1, 600);
+// Offset eyes along local X — will be updated each frame from camera quaternion
+camL.position.set(-EYE_SEPARATION, 0, 0);
+camR.position.set( EYE_SEPARATION, 0, 0);
+camera.add(camL);
+camera.add(camR);
+scene.add(camera);
+
+function updateCameraAspect(){
+  if(vrMode){
+    var hw = window.innerWidth/2, h = window.innerHeight;
+    camL.aspect = hw/h; camL.updateProjectionMatrix();
+    camR.aspect = hw/h; camR.updateProjectionMatrix();
+  } else {
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+  }
+}
 
 window.addEventListener('resize', function(){
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
+  updateCameraAspect();
 });
 
 // ═══════════════════════════════════════════════════════
@@ -466,7 +509,27 @@ function renderLoop(){
     var euler=new THREE.Euler(rideState.pitch,rideState.yaw,rideState.roll,'YXZ');
     camera.quaternion.setFromEuler(euler);
   }
-  renderer.render(scene,camera);
+
+  if(vrMode){
+    var W=window.innerWidth, H=window.innerHeight, HW=Math.floor(W/2);
+
+    // Left eye
+    renderer.setScissorTest(true);
+    renderer.setScissor(0, 0, HW, H);
+    renderer.setViewport(0, 0, HW, H);
+    renderer.render(scene, camL);
+
+    // Right eye
+    renderer.setScissor(HW, 0, HW, H);
+    renderer.setViewport(HW, 0, HW, H);
+    renderer.render(scene, camR);
+
+    renderer.setScissorTest(false);
+    renderer.setScissor(0, 0, W, H);
+    renderer.setViewport(0, 0, W, H);
+  } else {
+    renderer.render(scene, camera);
+  }
 }
 renderLoop();
 
@@ -572,7 +635,73 @@ document.getElementById('hbk').onclick=function(){
   document.getElementById('pgb').style.width='0%';
   var flash=document.getElementById('flash');
   flash.style.opacity='0';flash.style.transition='';
+  // Exit VR when going back to menu
+  if(vrMode) toggleVR();
 };
+
+// ═══════════════════════════════════════════════════════
+// CARDBOARD VR TOGGLE
+// ═══════════════════════════════════════════════════════
+function toggleVR(){
+  vrMode = !vrMode;
+  var btn  = document.getElementById('vrBtn');
+  var sep  = document.getElementById('vrSep');
+  var barrel = document.getElementById('vrBarrel');
+
+  if(vrMode){
+    btn.classList.add('active');
+    btn.textContent = '🥽 Exit VR';
+    sep.style.display = 'block';
+    barrel.style.display = 'block';
+    updateCameraAspect();
+    // Request fullscreen + landscape for phone
+    if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){});
+    // Request device orientation for gyro head-tracking
+    if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+      DeviceOrientationEvent.requestPermission().then(function(p){
+        if(p==='granted') window.addEventListener('deviceorientation', onDeviceOrientation);
+      }).catch(function(){});
+    } else {
+      window.addEventListener('deviceorientation', onDeviceOrientation);
+    }
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '📦 VR Mode';
+    sep.style.display = 'none';
+    barrel.style.display = 'none';
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    window.removeEventListener('deviceorientation', onDeviceOrientation);
+    if(document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+}
+
+document.getElementById('vrBtn').onclick = toggleVR;
+
+// ═══════════════════════════════════════════════════════
+// DEVICE ORIENTATION → camera yaw/pitch override in VR
+// ═══════════════════════════════════════════════════════
+var gyroQ = new THREE.Quaternion();
+var screenQ = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // landscape fix
+var worldQ  = new THREE.Quaternion();
+var gyroEuler = new THREE.Euler();
+
+function onDeviceOrientation(evt){
+  if(!vrMode) return;
+  if(evt.alpha===null) return;
+  var a = THREE.MathUtils.degToRad(evt.alpha);
+  var b = THREE.MathUtils.degToRad(evt.beta);
+  var g = THREE.MathUtils.degToRad(evt.gamma);
+  gyroEuler.set(b, a, -g, 'YXZ');
+  gyroQ.setFromEuler(gyroEuler);
+  gyroQ.multiply(screenQ);
+  // Apply gyro on top of the ride's base orientation
+  if(rideState){
+    var rideBase = new THREE.Quaternion();
+    rideBase.setFromEuler(new THREE.Euler(rideState.pitch, rideState.yaw, rideState.roll, 'YXZ'));
+    camera.quaternion.copy(gyroQ);
+  }
+}
 </script>
 </body>
 </html>
