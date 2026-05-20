@@ -12,20 +12,17 @@
   --accent:#7eb8f7;--accent2:#ff5f6d;--warn:#f5c542;--green:#3ddc84;
   --text:#cdd6e8;--muted:#4a566e;--green-dim:rgba(61,220,132,.1);
 }
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Syne',sans-serif;color:var(--text)}
-#c{position:fixed;inset:0;z-index:1;display:block}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Syne',sans-serif;color:var(--text)}
 
-/* ══════════════════════════════════
-   SCREEN LAYER SYSTEM
-   All screens sit at z:200, hidden by default
-   ══════════════════════════════════ */
-.screen{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity .5s ease;background:rgba(8,9,11,.97);overflow-y:auto;padding:24px 16px}
+/* Canvas fills entire screen — no gaps */
+#c{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;display:block}
+
+/* ── Screen layer system ── */
+.screen{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;transition:opacity .5s ease;background:rgba(8,9,11,.97);overflow-y:auto;padding:24px 16px}
 .screen.hidden{opacity:0;pointer-events:none}
 
-/* ══════════════════════════════════
-   SHARED CARD / TYPE COMPONENTS
-   ══════════════════════════════════ */
+/* ── Shared components ── */
 .logo-mark{font-size:11px;font-family:'Space Mono',monospace;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
 .logo-title{font-size:clamp(32px,7vw,58px);font-weight:800;letter-spacing:-2px;line-height:.95;color:var(--text)}
 .logo-title span{color:var(--accent)}
@@ -47,12 +44,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 #btStatus{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7;display:none}
 
-/* ── Game select cards ── */
+/* ── Game cards ── */
 .game-grid{display:flex;flex-direction:column;gap:10px}
 .game-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
   cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
-.game-card::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,var(--accent),transparent);
-  opacity:0;transition:opacity .2s}
+.game-card::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,var(--accent),transparent);opacity:0;transition:opacity .2s}
 .game-card:hover{border-color:rgba(126,184,247,.4);transform:translateY(-1px)}
 .game-card:hover::before{opacity:.04}
 .game-card.locked{opacity:.4;cursor:not-allowed}
@@ -68,27 +64,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .gc-arrow{margin-left:auto;color:var(--muted);font-size:18px;position:relative;z-index:1;transition:transform .18s}
 .game-card:not(.locked):hover .gc-arrow{transform:translateX(3px);color:var(--accent)}
 
-/* ── Primary button ── */
+/* ── Buttons ── */
 .btn-primary{background:var(--accent);color:#07090e;border:none;border-radius:10px;
   padding:15px 22px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;
   cursor:pointer;transition:all .15s;width:100%;letter-spacing:-.2px}
 .btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none}
 .btn-ghost{background:transparent;border:1px solid var(--border);border-radius:10px;
   padding:11px 18px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);
   cursor:pointer;transition:all .15s;letter-spacing:.06em}
 .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
 .hint-text{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:center;line-height:1.9}
 
-/* ══════════════════════════════════
-   SCREEN 1  — MAIN MENU
-   ══════════════════════════════════ */
-#screenMenu{}
-
-/* ══════════════════════════════════
-   SCREEN 2  — CONCEPT / PRE-START
-   ══════════════════════════════════ */
-#screenConcept{}
+/* ── Concept screen ── */
 .concept-hero{background:var(--surface);border:1px solid var(--border);border-radius:14px;
   padding:22px 22px 18px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
 .concept-hero::after{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;
@@ -97,13 +84,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .concept-title{font-size:22px;font-weight:800;letter-spacing:-0.5px;line-height:1.1}
 .concept-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8}
 .region-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
-.pill{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 8px;border-radius:20px}
+.pill{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px}
 .pill.e{background:rgba(126,184,247,.12);color:var(--accent);border:1px solid rgba(126,184,247,.2)}
 .pill.p{background:rgba(245,197,66,.12);color:var(--warn);border:1px solid rgba(245,197,66,.2)}
 .pill.n{background:rgba(255,95,109,.12);color:var(--accent2);border:1px solid rgba(255,95,109,.2)}
-
-/* VR headset prompt */
 .headset-prompt{background:var(--surface);border:1px solid rgba(126,184,247,.2);border-radius:14px;
   padding:18px 20px;display:flex;gap:14px;align-items:flex-start}
 .headset-icon{font-size:32px;flex-shrink:0;margin-top:2px}
@@ -111,9 +95,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .headset-text strong{font-size:14px;font-weight:700;color:var(--accent)}
 .headset-text p{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7}
 
-/* ══════════════════════════════════
-   SCREEN 3  — COUNTDOWN
-   ══════════════════════════════════ */
+/* ── Countdown ── */
 #screenCountdown{background:rgba(8,9,11,.98)}
 .countdown-num{font-size:clamp(120px,30vw,220px);font-weight:800;color:var(--accent);
   line-height:1;letter-spacing:-8px;animation:countPop .4s cubic-bezier(.2,1.4,.4,1) forwards}
@@ -121,75 +103,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .countdown-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;
   text-transform:uppercase;color:var(--muted);margin-top:12px}
 
-/* ══════════════════════════════════
-   HUD (in-ride)
-   ══════════════════════════════════ */
-#hud{position:fixed;inset:0;z-index:100;pointer-events:none;display:none}
-#hud.on{display:block}
-.htl{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:5px}
-.hm{font-size:clamp(11px,2.2vw,16px);font-weight:800;color:var(--text);text-shadow:0 1px 8px #000}
-.hrg{font-family:'Space Mono',monospace;font-size:clamp(7px,1.3vw,10px);letter-spacing:.1em;
-  text-transform:uppercase;padding:3px 7px;border-radius:4px;width:fit-content}
-.re{background:rgba(126,184,247,.12);color:var(--accent);border:1px solid rgba(126,184,247,.25)}
-.rp{background:rgba(245,197,66,.12);color:var(--warn);border:1px solid rgba(245,197,66,.25)}
-.rn{background:rgba(255,95,109,.12);color:var(--accent2);border:1px solid rgba(255,95,109,.25)}
-.htr{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-.hv{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
-.hvl{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-.hvn{font-family:'Space Mono',monospace;font-size:clamp(11px,1.8vw,15px);font-weight:700;color:var(--text);text-shadow:0 1px 6px #000}
-.hgw{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(8,9,11,.9);
-  border:1px solid var(--border);border-radius:10px;padding:8px 12px 6px;display:flex;flex-direction:column;align-items:center;gap:3px}
-.hgl{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-#hc{display:block}
-.hbk{position:absolute;top:16px;left:50%;transform:translateX(-50%);pointer-events:all;
-  background:rgba(8,9,11,.88);border:1px solid var(--border);border-radius:8px;padding:6px 13px;
-  color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.07em;transition:all .15s}
+/* ── In-ride HTML controls (exit button + progress only) ── */
+#rideControls{position:fixed;inset:0;z-index:100;pointer-events:none;display:none}
+#rideControls.on{display:block}
+.hbk{position:absolute;top:12px;left:50%;transform:translateX(-50%);pointer-events:all;
+  background:rgba(8,9,11,.85);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  padding:5px 14px;color:rgba(200,210,230,.6);font-family:'Space Mono',monospace;
+  font-size:10px;cursor:pointer;letter-spacing:.07em;transition:all .15s;z-index:110}
 .hbk:hover{color:var(--text);border-color:var(--muted)}
 .hpw{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.06)}
 #pgb{height:100%;width:0%;background:var(--accent);transition:width .08s linear}
 
-/* ── Motion sim panel ── */
-#simPanel{position:absolute;bottom:80px;right:16px;pointer-events:all;background:rgba(8,9,11,.92);
-  border:1px solid var(--border);border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;
-  gap:7px;min-width:178px}
-.sp-title{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.12em;
-  text-transform:uppercase;display:flex;align-items:center;gap:6px}
-.sp-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
-.sp-dot.live{background:var(--green);box-shadow:0 0 5px var(--green);animation:blink 2s infinite}
-.sp-dot.lag{background:var(--warn);box-shadow:0 0 5px var(--warn);animation:blink .5s infinite}
-.sp-dot.err{background:var(--accent2)}
-.sp-row{display:flex;flex-direction:column;gap:2px}
-.sp-lbl{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-.sp-bar-wrap{height:3px;background:rgba(255,255,255,.06);border-radius:2px;position:relative;overflow:hidden}
-.sp-fill{position:absolute;top:0;height:100%;border-radius:2px;transition:left .1s ease,width .1s ease}
-.sp-vals{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:8px}
-.sp-tgt{color:var(--accent)}.sp-act{color:var(--green)}.sp-err-val{color:var(--accent2)}
-#simWait{font-family:'Space Mono',monospace;font-size:8px;color:var(--warn);text-align:center;display:none;letter-spacing:.05em}
-
-/* ══════════════════════════════════
-   VR SPLIT SCREEN
-   ══════════════════════════════════ */
-#vrSep{position:fixed;top:0;left:50%;width:3px;height:100%;background:#000;z-index:50;display:none;pointer-events:none;transform:translateX(-50%)}
-/* Cardboard barrel vignette — dims outer edges of each eye */
+/* VR center divider */
+#vrSep{position:fixed;top:0;left:50%;width:3px;height:100%;background:#000;z-index:50;
+  display:none;pointer-events:none;transform:translateX(-50%)}
+/* Cardboard lens vignette */
 #vrVig{position:fixed;inset:0;z-index:49;pointer-events:none;display:none}
 #vrVig::before,#vrVig::after{content:'';position:absolute;top:0;bottom:0;width:50%;
-  background:radial-gradient(ellipse 82% 88% at center,transparent 55%,rgba(0,0,0,.9) 100%)}
-#vrVig::before{left:0}
-#vrVig::after{right:0}
+  background:radial-gradient(ellipse 80% 85% at center,transparent 52%,rgba(0,0,0,.92) 100%)}
+#vrVig::before{left:0}#vrVig::after{right:0}
 
-/* FRACTURE FLASH */
+/* Fracture flash */
 #flash{position:fixed;inset:0;z-index:300;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s}
+
+/* Off-screen HUD canvas (we draw onto a texture, never shown directly) */
+#hudCanvas{display:none}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<!-- Hidden canvas we paint the HUD onto → converted to WebGL texture -->
+<canvas id="hudCanvas" width="1024" height="512"></canvas>
 <div id="flash"></div>
 <div id="vrSep"></div>
 <div id="vrVig"></div>
 
-<!-- ══════════════════════════════════════════════════════
-     SCREEN 1 · MAIN MENU
-     ══════════════════════════════════════════════════════ -->
+<!-- SCREEN 1: MENU -->
 <div class="screen" id="screenMenu">
   <div class="mi">
     <div style="margin-bottom:4px">
@@ -197,15 +146,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
       <div class="logo-title">Motion<br><span>Simulator</span></div>
       <div class="logo-sub">Experiential Materials Science</div>
     </div>
-
-    <!-- BLE Connect -->
     <div class="card">
       <div class="card-label">Motion Chair · Bluetooth</div>
       <button id="btConn"><div class="bt-dot"></div><span id="btLabel">Connect to Chair (BLE)</span></button>
       <div id="btStatus"></div>
     </div>
-
-    <!-- Game select -->
     <div class="card">
       <div class="card-label">Select Experience</div>
       <div class="game-grid">
@@ -242,92 +187,39 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     SCREEN 2 · CONCEPT / PRE-START
-     ══════════════════════════════════════════════════════ -->
+<!-- SCREEN 2: CONCEPT -->
 <div class="screen hidden" id="screenConcept">
   <div class="mi">
-    <!-- Concept hero -->
     <div class="concept-hero">
       <div class="concept-number">Experience 01 / Aluminum</div>
       <div class="concept-title">Aluminum 6061<br>Stress–Strain Ride</div>
-      <div class="concept-meta">
-        Elastic modulus 70 GPa · Yield 280 MPa · UTS 440 MPa<br>
-        Duration ~90 seconds · Motion chair enabled
-      </div>
+      <div class="concept-meta">Elastic modulus 70 GPa · Yield 280 MPa · UTS 440 MPa<br>Duration ~90 seconds · Motion chair enabled</div>
       <div class="region-pills">
-        <div class="pill e">Elastic</div>
-        <div class="pill p">Plastic</div>
-        <div class="pill n">Necking</div>
-        <div class="pill n">Fracture</div>
+        <div class="pill e">Elastic</div><div class="pill p">Plastic</div>
+        <div class="pill n">Necking</div><div class="pill n">Fracture</div>
       </div>
     </div>
-
-    <!-- Headset prompt -->
     <div class="headset-prompt">
       <div class="headset-icon">🥽</div>
       <div class="headset-text">
         <strong>Place your phone in the VR headset</strong>
-        <p>Insert phone into Google Cardboard before pressing Start.<br>
-        The screen will split automatically when the ride begins.</p>
+        <p>Insert phone into Google Cardboard before pressing Start.<br>The screen splits automatically when the ride begins.</p>
       </div>
     </div>
-
     <button class="btn-primary" id="btnStart">START RIDE  →</button>
     <button class="btn-ghost" id="btnBack">← Back to menu</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     SCREEN 3 · COUNTDOWN
-     ══════════════════════════════════════════════════════ -->
+<!-- SCREEN 3: COUNTDOWN -->
 <div class="screen hidden" id="screenCountdown">
   <div class="countdown-num" id="cdNum">3</div>
   <div class="countdown-label" id="cdLabel">Get ready…</div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     HUD (in-ride, overlays the 3D canvas)
-     ══════════════════════════════════════════════════════ -->
-<div id="hud">
-  <div class="htl">
-    <div class="hm" id="hm">Aluminum 6061</div>
-    <div class="hrg re" id="hrg">Elastic Region</div>
-  </div>
-  <div class="htr">
-    <div class="hv"><div class="hvl">Stress σ</div><div class="hvn" id="hs">0 MPa</div></div>
-    <div class="hv"><div class="hvl">Strain ε</div><div class="hvn" id="he">0.0000</div></div>
-  </div>
-  <div class="hgw">
-    <div class="hgl">σ–ε curve</div>
-    <canvas id="hc" width="160" height="70"></canvas>
-  </div>
+<!-- In-ride HTML controls (exit + progress bar only — rest is drawn in WebGL) -->
+<div id="rideControls">
   <button class="hbk" id="hbk">← exit ride</button>
-
-  <!-- Motion sim panel -->
-  <div id="simPanel">
-    <div class="sp-title"><div class="sp-dot err" id="spDot"></div><span id="spTitle">Sim: No BLE</span></div>
-    <div class="sp-row">
-      <div class="sp-lbl">Pitch</div>
-      <div class="sp-bar-wrap"><div class="sp-fill" id="pitchFill" style="background:var(--accent);left:50%;width:0%"></div></div>
-      <div class="sp-vals">
-        <span class="sp-tgt" id="pitchTgt">T:0.0°</span>
-        <span class="sp-act" id="pitchAct">A:—</span>
-        <span class="sp-err-val" id="pitchErr"></span>
-      </div>
-    </div>
-    <div class="sp-row">
-      <div class="sp-lbl">Roll</div>
-      <div class="sp-bar-wrap"><div class="sp-fill" id="rollFill" style="background:var(--accent);left:50%;width:0%"></div></div>
-      <div class="sp-vals">
-        <span class="sp-tgt" id="rollTgt">T:0.0°</span>
-        <span class="sp-act" id="rollAct">A:—</span>
-        <span class="sp-err-val" id="rollErr"></span>
-      </div>
-    </div>
-    <div id="simWait">⏳ catching up…</div>
-  </div>
-
   <div class="hpw"><div id="pgb"></div></div>
 </div>
 
@@ -335,22 +227,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 <script>
 'use strict';
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────
+//  DEBUG — log BLE raw bytes to console for diagnostics
+// ─────────────────────────────────────────────────────────
+var DEBUG_BLE = true;
+
+// ─────────────────────────────────────────────────────────
 //  SCREEN MANAGER
-// ═══════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────
 function showScreen(id){
   ['screenMenu','screenConcept','screenCountdown'].forEach(function(s){
-    var el=document.getElementById(s);
-    if(s===id){ el.classList.remove('hidden'); }
-    else       { el.classList.add('hidden');    }
+    document.getElementById(s).classList[s===id?'remove':'add']('hidden');
   });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  BLE LAYER  —  HM-10 Nordic UART  (FFE0 / FFE1)
+//  BLE LAYER  — HM-10 FFE0/FFE1
 //
-//  Browser → Arduino : "T{pitch_deg},{roll_deg}\n"
-//  Arduino → Browser : "A{pitch_deg},{roll_deg}\n"
+//  FIXED: robust line accumulation handles \r\n split across packets.
+//  FIXED: logs raw bytes to console when DEBUG_BLE=true so you can see
+//         exactly what the HM-10 is sending.
+//
+//  Arduino sends:  "A{pitch},{roll}\r\n"   (bleSerial.println)
+//  Browser parses: strips \r, splits on \n, checks first char === 'A'
 // ═══════════════════════════════════════════════════════════════════════════
 var BLE=(function(){
   var SVC ='0000ffe0-0000-1000-8000-00805f9b34fb';
@@ -358,7 +257,11 @@ var BLE=(function(){
   var device=null,char=null,connected=false,rxBuf='';
   var cbRx=null,cbConn=null,cbDisc=null;
 
-  function setStatus(m){var e=document.getElementById('btStatus');if(e){e.style.display='block';e.textContent=m;}}
+  function setStatus(m){
+    var e=document.getElementById('btStatus');
+    if(e){e.style.display='block';e.textContent=m;}
+    console.log('[BLE]',m);
+  }
   function setBtnState(s){
     var btn=document.getElementById('btConn'),lbl=document.getElementById('btLabel');
     btn.className='';
@@ -366,16 +269,31 @@ var BLE=(function(){
     else if(s==='scanning'){btn.classList.add('scanning');lbl.textContent='Scanning for HM-10…';}
     else{lbl.textContent='Connect to Chair (BLE)';}
   }
-  function onDrop(){connected=false;char=null;setBtnState('idle');setStatus('Disconnected.');if(cbDisc)cbDisc();}
+  function onDrop(){
+    connected=false;char=null;rxBuf='';
+    setBtnState('idle');setStatus('Disconnected.');
+    if(cbDisc)cbDisc();
+  }
   function onRx(evt){
-    var val=evt.target.value,str='';
+    var val=evt.target.value;
+    var str='';
     for(var i=0;i<val.byteLength;i++) str+=String.fromCharCode(val.getUint8(i));
+    if(DEBUG_BLE) console.log('[BLE RX raw]',JSON.stringify(str));
     rxBuf+=str;
-    var lines=rxBuf.split('\n');rxBuf=lines.pop();
-    for(var i=0;i<lines.length;i++){var l=lines[i].trim();if(l&&cbRx)cbRx(l);}
+    // Split on \n — trim() removes any trailing \r
+    var lines=rxBuf.split('\n');
+    rxBuf=lines.pop(); // keep incomplete tail
+    for(var i=0;i<lines.length;i++){
+      var l=lines[i].replace(/\r/g,'').trim();
+      if(DEBUG_BLE) console.log('[BLE RX line]',JSON.stringify(l));
+      if(l&&cbRx) cbRx(l);
+    }
   }
   async function connect(){
-    if(!navigator.bluetooth){alert('Web Bluetooth not supported.\nUse Chrome on Android or desktop Chrome.\nOn Mac/Win enable: chrome://flags/#enable-experimental-web-platform-features');return;}
+    if(!navigator.bluetooth){
+      alert('Web Bluetooth not supported.\nUse Chrome on Android, or desktop Chrome.\nMac/Win: enable chrome://flags/#enable-experimental-web-platform-features');
+      return;
+    }
     setBtnState('scanning');setStatus('Opening device picker…');
     try{
       device=await navigator.bluetooth.requestDevice({filters:[{services:[SVC]}]});
@@ -386,136 +304,128 @@ var BLE=(function(){
       char=await svc.getCharacteristic(CHAR);
       await char.startNotifications();
       char.addEventListener('characteristicvaluechanged',onRx);
-      connected=true;setBtnState('linked');setStatus('✓ Connected: '+device.name);
+      connected=true;
+      setBtnState('linked');
+      setStatus('✓ Connected: '+device.name);
       if(cbConn)cbConn(device.name);
-    }catch(e){setBtnState('idle');setStatus('BLE error: '+e.message);}
+    }catch(e){
+      setBtnState('idle');
+      setStatus('BLE error: '+e.message);
+      console.error('[BLE]',e);
+    }
   }
   async function send(msg){
     if(!connected||!char)return;
     var bytes=new TextEncoder().encode(msg);
     for(var off=0;off<bytes.length;off+=20){
-      try{await char.writeValue(bytes.slice(off,Math.min(off+20,bytes.length)));}catch(e){}
+      try{
+        // Try writeValueWithoutResponse first (faster, HM-10 prefers it)
+        if(char.properties&&char.properties.writeWithoutResponse){
+          await char.writeValueWithoutResponse(bytes.slice(off,Math.min(off+20,bytes.length)));
+        } else {
+          await char.writeValue(bytes.slice(off,Math.min(off+20,bytes.length)));
+        }
+      }catch(e){ console.warn('[BLE send]',e.message); }
     }
   }
   document.getElementById('btConn').addEventListener('click',function(){
     if(connected&&device)device.gatt.disconnect();else connect();
   });
-  return{isConnected:function(){return connected;},send:send,
-    onRxLine:function(fn){cbRx=fn;},onConnect:function(fn){cbConn=fn;},onDisconnect:function(fn){cbDisc=fn;}};
+  return{
+    isConnected:function(){return connected;},
+    send:send,
+    onRxLine:function(fn){cbRx=fn;},
+    onConnect:function(fn){cbConn=fn;},
+    onDisconnect:function(fn){cbDisc=fn;}
+  };
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  MOTION SIMULATOR CONTROLLER
-//
-//  VR pitch/roll (radians) → target degrees sent over BLE
-//  Chair uses BTS7960 H-bridge driven by PID against MPU6050 feedback
-//  Max physical travel: ±10° (enforced here AND in firmware)
-//
-//  Closed-loop: ride advancement pauses when |error| > HOLD_DEG
+//  MOTION SIM CONTROLLER
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
-  // Must match PITCH_MAX / ROLL_MAX in the Arduino sketch
-  var PITCH_MAX=10.0;   // degrees — hard chair limit
-  var ROLL_MAX =10.0;   // degrees
-  var HOLD_DEG =2.5;    // pause ride if error exceeds this
-  var SEND_MS  =80;     // BLE packet interval
-  var RETRY_MS =50;     // closed-loop retry when lagging
-
-  var tP=0,tR=0;        // target degrees
-  var aP=null,aR=null;  // actual degrees from MPU6050
-  var lagging=false;
-  var timer=null;
+  var PITCH_MAX=10.0, ROLL_MAX=10.0;
+  var HOLD_DEG=2.5, SEND_MS=80, RETRY_MS=50;
+  var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
 
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
 
   function setTarget(pitchRad,rollRad){
     tP=clamp(THREE.MathUtils.radToDeg(pitchRad),PITCH_MAX);
-    tR=clamp(THREE.MathUtils.radToDeg(rollRad), ROLL_MAX);
-    refreshHUD();
+    tR=clamp(THREE.MathUtils.radToDeg(rollRad),ROLL_MAX);
+    hudDirty=true;
   }
 
+  // ── Parse "A{pitch},{roll}" from Arduino ──
+  // Robust: handle both "A-8.1,4.0" and edge cases
   BLE.onRxLine(function(line){
-    if(line.charAt(0)!=='A')return;
-    var parts=line.substring(1).split(',');
-    if(parts.length<2)return;
-    var p=parseFloat(parts[0]),r=parseFloat(parts[1]);
-    if(isNaN(p)||isNaN(r))return;
-    aP=p;aR=r;
+    console.log('[SIM rx]',line,'charCode0=',line.charCodeAt(0));
+    var ch=line.charAt(0);
+    if(ch!=='A'){
+      console.warn('[SIM] unexpected prefix:',ch,'('+line.charCodeAt(0)+')');
+      return;
+    }
+    var body=line.substring(1);
+    var comma=body.indexOf(',');
+    if(comma<0){console.warn('[SIM] no comma in:',line);return;}
+    var p=parseFloat(body.substring(0,comma));
+    var r=parseFloat(body.substring(comma+1));
+    if(isNaN(p)||isNaN(r)){console.warn('[SIM] NaN parse:',line);return;}
+    aP=p; aR=r;
     lagging=(Math.abs(tP-aP)>HOLD_DEG||Math.abs(tR-aR)>HOLD_DEG);
-    refreshHUD();
+    hudDirty=true;
+    console.log('[SIM] actual pitch='+aP+' roll='+aR+' lagging='+lagging);
   });
 
-  function sendPkt(){if(!BLE.isConnected())return;BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');}
+  function sendPkt(){
+    if(!BLE.isConnected())return;
+    BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');
+  }
   function startSending(){if(timer)clearInterval(timer);timer=setInterval(sendPkt,SEND_MS);}
   function stopSending(){
     if(timer){clearInterval(timer);timer=null;}
-    tP=0;tR=0;if(BLE.isConnected())BLE.send('T0.0,0.0\n');
-    refreshHUD();
+    tP=0;tR=0;
+    if(BLE.isConnected())BLE.send('T0.0,0.0\n');
+    hudDirty=true;
   }
   function isLagging(){return BLE.isConnected()&&lagging;}
   function getRetryMs(){return RETRY_MS;}
 
-  function barCSS(val,max){
-    var pct=Math.abs(val/max)*50;
-    return val>=0?{left:'50%',width:pct+'%'}:{left:(50-pct)+'%',width:pct+'%'};
-  }
+  // Expose state for HUD drawing
+  function getState(){return{tP:tP,tR:tR,aP:aP,aR:aR,lagging:lagging,
+    connected:BLE.isConnected(),PITCH_MAX:PITCH_MAX,ROLL_MAX:ROLL_MAX,HOLD_DEG:HOLD_DEG};}
 
-  function refreshHUD(){
-    var dot=document.getElementById('spDot'),title=document.getElementById('spTitle'),wait=document.getElementById('simWait');
-    if(!BLE.isConnected()){dot.className='sp-dot err';title.textContent='Sim: No BLE';wait.style.display='none';}
-    else if(lagging){dot.className='sp-dot lag';title.textContent='Sim: Catching up…';wait.style.display='block';}
-    else{dot.className='sp-dot live';title.textContent='Sim: Live ●';wait.style.display='none';}
+  BLE.onConnect(function(){hudDirty=true;startSending();});
+  BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();hudDirty=true;});
 
-    var pb=barCSS(tP,PITCH_MAX),pf=document.getElementById('pitchFill');
-    pf.style.left=pb.left;pf.style.width=pb.width;
-    pf.style.background=lagging?'var(--warn)':'var(--accent)';
-    document.getElementById('pitchTgt').textContent='T:'+tP.toFixed(1)+'°';
-    if(aP!==null){
-      document.getElementById('pitchAct').textContent='A:'+aP.toFixed(1)+'°';
-      var pe=tP-aP;var peEl=document.getElementById('pitchErr');
-      peEl.textContent='Δ'+(pe>=0?'+':'')+pe.toFixed(1)+'°';
-      peEl.style.color=Math.abs(pe)>HOLD_DEG?'var(--accent2)':'var(--muted)';
-    }
-    var rb=barCSS(tR,ROLL_MAX),rf=document.getElementById('rollFill');
-    rf.style.left=rb.left;rf.style.width=rb.width;
-    rf.style.background=lagging?'var(--warn)':'var(--accent)';
-    document.getElementById('rollTgt').textContent='T:'+tR.toFixed(1)+'°';
-    if(aR!==null){
-      document.getElementById('rollAct').textContent='A:'+aR.toFixed(1)+'°';
-      var re=tR-aR;var reEl=document.getElementById('rollErr');
-      reEl.textContent='Δ'+(re>=0?'+':'')+re.toFixed(1)+'°';
-      reEl.style.color=Math.abs(re)>HOLD_DEG?'var(--accent2)':'var(--muted)';
-    }
-  }
-
-  BLE.onConnect(function(){refreshHUD();startSending();});
-  BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();refreshHUD();});
-  refreshHUD();
-  return{setTarget,isLagging,getRetryMs,startSending,stopSending};
+  return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState};
 })();
 
-// ═══════════════════════════════════════════════════════
-//  THREE.JS — renderer, scene, cameras
-// ═══════════════════════════════════════════════════════
-var canvas=document.getElementById('c');
-var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
+// ═══════════════════════════════════════════════════════════════════════════
+//  THREE.JS SETUP
+// ═══════════════════════════════════════════════════════════════════════════
+var W=window.innerWidth, H=window.innerHeight;
+var threeCanvas=document.getElementById('c');
+var renderer=new THREE.WebGLRenderer({canvas:threeCanvas,antialias:true});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setSize(W,H);
 renderer.setClearColor(0x08090b);
 
 var scene=new THREE.Scene();
 scene.fog=new THREE.Fog(0x08090b,80,200);
 
-// Main (mono) camera
-var camera=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,0.1,600);
+// Main camera (used for mono mode + as parent for eye cameras)
+var camera=new THREE.PerspectiveCamera(80,W/H,0.1,600);
 camera.position.set(0,2,0);
 
-// Stereo eye cameras (children of main camera)
-var EYE=0.032; // half-IPD in world units
+// Stereo eye cameras — offset along local X
+var EYE_SEP=0.032;
 var camL=new THREE.PerspectiveCamera(80,0.5,0.1,600);
 var camR=new THREE.PerspectiveCamera(80,0.5,0.1,600);
-camL.position.set(-EYE,0,0); camR.position.set(EYE,0,0);
-camera.add(camL); camera.add(camR);
+camL.position.set(-EYE_SEP,0,0);
+camR.position.set( EYE_SEP,0,0);
+camera.add(camL);
+camera.add(camR);
 scene.add(camera);
 
 var vrMode=false;
@@ -524,23 +434,23 @@ function setVR(on){
   vrMode=on;
   document.getElementById('vrSep').style.display=on?'block':'none';
   document.getElementById('vrVig').style.display=on?'block':'none';
-  resizeCameras();
+  resizeCams();
 }
-
-function resizeCameras(){
+function resizeCams(){
   if(vrMode){
-    var hw=window.innerWidth/2,h=window.innerHeight;
-    camL.aspect=hw/h; camL.updateProjectionMatrix();
-    camR.aspect=hw/h; camR.updateProjectionMatrix();
+    var hw=W/2;
+    camL.aspect=hw/H; camL.updateProjectionMatrix();
+    camR.aspect=hw/H; camR.updateProjectionMatrix();
   } else {
-    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.aspect=W/H;
     camera.updateProjectionMatrix();
   }
 }
-
 window.addEventListener('resize',function(){
-  renderer.setSize(window.innerWidth,window.innerHeight);
-  resizeCameras();
+  W=window.innerWidth; H=window.innerHeight;
+  renderer.setSize(W,H);
+  resizeCams();
+  hudDirty=true;
 });
 
 // ── Lights ──
@@ -553,50 +463,285 @@ function alMat(rough,metal,col){
   return new THREE.MeshStandardMaterial({color:col||0xb8c8d8,metalness:metal!==undefined?metal:0.92,roughness:rough!==undefined?rough:0.18});
 }
 
-// ═══════════════════════════════════════════════════════
-//  RIDE STATE
-// ═══════════════════════════════════════════════════════
-var rideState=null,trackObjects=[],worldObjects=[],debrisList=[],fractured=false,stretchTarget=1.0,worldGroup;
+// ═══════════════════════════════════════════════════════════════════════════
+//  IN-SCENE HUD  — drawn onto a 2D canvas, applied as texture to a plane
+//  that always faces the camera (billboarded), anchored in clip space.
+//
+//  We maintain TWO small planes:
+//    hudPlaneL — bottom-left: stress/strain text + region label + σ-ε graph
+//    hudPlaneR — bottom-right: sim telemetry (target, actual, error)
+//
+//  Both planes are children of the camera so they move with it, and are
+//  rendered into BOTH eye viewports automatically.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Off-screen canvas for HUD drawing
+var HUD_W=1024, HUD_H=512;
+var hudCanvas=document.getElementById('hudCanvas');
+hudCanvas.width=HUD_W; hudCanvas.height=HUD_H;
+var hctx=hudCanvas.getContext('2d');
+
+// Three.js texture that wraps the hudCanvas
+var hudTex=new THREE.CanvasTexture(hudCanvas);
+hudTex.minFilter=THREE.LinearFilter;
+hudTex.magFilter=THREE.LinearFilter;
+
+// We draw the FULL HUD onto hudCanvas and use TWO planes — left half and right half
+// Each plane shows half the hudCanvas (graph left, telemetry right)
+var hudMat=new THREE.MeshBasicMaterial({map:hudTex,transparent:true,depthTest:false,depthWrite:false});
+
+// Single wide plane showing full HUD canvas, locked to camera view
+// Position: just below centre, close to near plane
+var hudPlane=new THREE.Mesh(
+  new THREE.PlaneGeometry(1.8,0.9),
+  hudMat
+);
+// Anchor to camera — place in camera local space
+hudPlane.position.set(0,-0.28,-1.0); // slightly down, close
+hudPlane.renderOrder=999;
+camera.add(hudPlane);
+
+var hudVisible=false;
+var hudDirty=true;
+
+// State cache for HUD
+var hudState={
+  region:'e', stress:0, strain:0,
+  curvePts:[], curveIdx:0
+};
+
+// ── Colour palette in canvas coords ──
+var C_BG   ='rgba(8,9,11,0.82)';
+var C_BDR  ='rgba(28,34,51,0.9)';
+var C_ACCENT='#7eb8f7';
+var C_WARN  ='#f5c542';
+var C_ERR   ='#ff5f6d';
+var C_GREEN ='#3ddc84';
+var C_MUTED ='#4a566e';
+var C_TEXT  ='#cdd6e8';
+var REGION_COL={e:C_ACCENT,p:C_WARN,n:C_ERR};
+var REGION_LABEL={e:'ELASTIC REGION',p:'PLASTIC DEFORMATION',n:'NECKING / FRACTURE'};
+
+function drawHUD(){
+  if(!hudVisible){hctx.clearRect(0,0,HUD_W,HUD_H);hudTex.needsUpdate=true;return;}
+
+  hctx.clearRect(0,0,HUD_W,HUD_H);
+
+  // ── LEFT PANEL: stress/strain info + graph ──────────────────────────────
+  var LX=16,LY=16,LW=490,LH=HUD_H-32;
+  roundRect(hctx,LX,LY,LW,LH,18,C_BG,C_BDR);
+
+  // Material name
+  hctx.font='bold 28px Syne, sans-serif';
+  hctx.fillStyle=C_TEXT;
+  hctx.fillText('Aluminum 6061',LX+18,LY+42);
+
+  // Region badge
+  var rc=REGION_COL[hudState.region]||C_ACCENT;
+  var rl=REGION_LABEL[hudState.region]||'';
+  hctx.font='bold 13px Space Mono, monospace';
+  hctx.fillStyle=rc;
+  hctx.fillText(rl,LX+18,LY+72);
+
+  // Stress
+  hctx.font='11px Space Mono, monospace';
+  hctx.fillStyle=C_MUTED;
+  hctx.fillText('STRESS  σ',LX+18,LY+108);
+  hctx.font='bold 32px Space Mono, monospace';
+  hctx.fillStyle=C_TEXT;
+  hctx.fillText(hudState.stress.toFixed(1)+' MPa',LX+18,LY+142);
+
+  // Strain
+  hctx.font='11px Space Mono, monospace';
+  hctx.fillStyle=C_MUTED;
+  hctx.fillText('STRAIN  ε',LX+18,LY+175);
+  hctx.font='bold 26px Space Mono, monospace';
+  hctx.fillStyle=C_TEXT;
+  hctx.fillText(hudState.strain.toFixed(4),LX+18,LY+205);
+
+  // σ–ε mini graph
+  var GX=LX+14,GY=LY+225,GW=LW-28,GH=LH-240;
+  drawGraph2D(hctx,GX,GY,GW,GH,hudState.curvePts,hudState.curveIdx);
+
+  // ── RIGHT PANEL: sim telemetry ──────────────────────────────────────────
+  var RX=HUD_W/2+16,RY=16,RW=HUD_W/2-32,RH=HUD_H-32;
+  roundRect(hctx,RX,RY,RW,RH,18,C_BG,C_BDR);
+
+  var ss=SIM.getState();
+  // Status dot + label
+  var dotCol=!ss.connected?C_ERR:ss.lagging?C_WARN:C_GREEN;
+  hctx.beginPath();hctx.arc(RX+22,RY+28,7,0,Math.PI*2);
+  hctx.fillStyle=dotCol;hctx.fill();
+  hctx.font='bold 13px Space Mono, monospace';
+  hctx.fillStyle=C_MUTED;
+  var simLabel=!ss.connected?'SIM: NO BLE':ss.lagging?'SIM: CATCHING UP…':'SIM: LIVE';
+  hctx.fillText(simLabel,RX+38,RY+33);
+
+  // Pitch row
+  drawSimAxis(hctx,RX+14,RY+62,RW-28,
+    'PITCH',ss.tP,ss.aP,ss.PITCH_MAX,ss.HOLD_DEG,ss.lagging,ss.connected);
+  // Roll row
+  drawSimAxis(hctx,RX+14,RY+180,RW-28,
+    'ROLL', ss.tR,ss.aR,ss.ROLL_MAX, ss.HOLD_DEG,ss.lagging,ss.connected);
+
+  // Lag warning
+  if(ss.lagging){
+    hctx.font='bold 14px Space Mono, monospace';
+    hctx.fillStyle=C_WARN;
+    hctx.textAlign='center';
+    hctx.fillText('⏳  WAITING FOR CHAIR…',RX+RW/2,RY+RH-24);
+    hctx.textAlign='left';
+  }
+
+  hudTex.needsUpdate=true;
+}
+
+function drawSimAxis(ctx,x,y,w,label,target,actual,maxDeg,holdDeg,lagging,connected){
+  // Label
+  ctx.font='10px Space Mono, monospace';
+  ctx.fillStyle=C_MUTED;
+  ctx.fillText(label,x,y);
+
+  // Bipolar bar background
+  var BX=x,BY=y+10,BW=w,BH=16;
+  ctx.fillStyle='rgba(255,255,255,0.06)';
+  roundRect(ctx,BX,BY,BW,BH,4,'rgba(255,255,255,0.06)',null);
+  ctx.fill();
+
+  // Target fill (from centre)
+  var tPct=Math.abs(target/maxDeg);
+  var barCol=lagging?C_WARN:C_ACCENT;
+  if(target>=0){
+    ctx.fillStyle=barCol;
+    ctx.fillRect(BX+BW/2,BY+2,tPct*(BW/2),BH-4);
+  } else {
+    ctx.fillStyle=barCol;
+    var fw=tPct*(BW/2);
+    ctx.fillRect(BX+BW/2-fw,BY+2,fw,BH-4);
+  }
+  // Centre line
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.fillRect(BX+BW/2-1,BY,2,BH);
+
+  // Values row
+  ctx.font='11px Space Mono, monospace';
+  ctx.fillStyle=C_ACCENT;
+  ctx.fillText('T:'+target.toFixed(1)+'°',x,y+44);
+  if(actual!==null&&connected){
+    ctx.fillStyle=C_GREEN;
+    ctx.fillText('A:'+actual.toFixed(1)+'°',x+w/2-30,y+44);
+    var err=target-actual;
+    var eCol=Math.abs(err)>holdDeg?C_ERR:C_MUTED;
+    ctx.fillStyle=eCol;
+    ctx.fillText('Δ'+(err>=0?'+':'')+err.toFixed(1)+'°',x+w-80,y+44);
+  } else {
+    ctx.fillStyle=C_MUTED;
+    ctx.fillText('A: —',x+w/2-30,y+44);
+  }
+
+  // Actual marker on bar
+  if(actual!==null&&connected){
+    var aPct=actual/maxDeg;
+    var mx=BX+BW/2+aPct*(BW/2);
+    mx=Math.max(BX+4,Math.min(BX+BW-4,mx));
+    ctx.beginPath();ctx.arc(mx,BY+BH/2,5,0,Math.PI*2);
+    ctx.fillStyle=C_GREEN;ctx.fill();
+  }
+}
+
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}
+}
+
+function drawGraph2D(ctx,gx,gy,gw,gh,pts,idx){
+  if(!pts||pts.length===0)return;
+  roundRect(ctx,gx,gy,gw,gh,10,'rgba(0,0,0,0.4)','rgba(255,255,255,0.06)');
+
+  var COLMAP={e:C_ACCENT,p:C_WARN,n:C_ERR};
+  var mxS=0,mxE=0;
+  for(var i=0;i<pts.length;i++){if(pts[i].stress>mxS)mxS=pts[i].stress;if(pts[i].strain>mxE)mxE=pts[i].strain;}
+  var pad=12;
+  var sx=function(e){return gx+pad+(e/mxE)*(gw-pad*2);};
+  var sy=function(s){return gy+gh-pad-(s/mxS)*(gh-pad*2);};
+
+  // Axes
+  ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(gx+pad,gy+pad);ctx.lineTo(gx+pad,gy+gh-pad);ctx.lineTo(gx+gw-pad,gy+gh-pad);ctx.stroke();
+
+  // Axis labels
+  ctx.font='10px Space Mono, monospace';ctx.fillStyle=C_MUTED;
+  ctx.fillText('ε',gx+gw-pad-6,gy+gh-2);
+  ctx.fillText('σ',gx+2,gy+pad+4);
+
+  // Curve
+  var lr=null;ctx.lineWidth=2;
+  for(var i=0;i<pts.length-1;i++){
+    if(pts[i].region!==lr){
+      if(lr!==null)ctx.stroke();
+      ctx.beginPath();ctx.moveTo(sx(pts[i].strain),sy(pts[i].stress));
+      ctx.strokeStyle=COLMAP[pts[i].region]||C_ACCENT;
+      lr=pts[i].region;
+    }
+    ctx.lineTo(sx(pts[i+1].strain),sy(pts[i+1].stress));
+  }
+  if(lr!==null)ctx.stroke();
+
+  // Current position dot
+  if(idx>=0&&idx<pts.length){
+    var p=pts[idx];
+    ctx.beginPath();ctx.arc(sx(p.strain),sy(p.stress),5,0,Math.PI*2);
+    ctx.fillStyle='#fff';ctx.fill();
+    ctx.strokeStyle='#08090b';ctx.lineWidth=1.5;ctx.stroke();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  WORLD
+// ═══════════════════════════════════════════════════════════════════════════
+var rideState=null,trackObjects=[],worldObjects=[],debrisList=[],fractured=false;
+var stretchTarget=1.0,worldGroup;
 
 function buildWorld(){
-  worldObjects.forEach(function(o){scene.remove(o);}); worldObjects=[];debrisList=[];fractured=false;
-  worldGroup=new THREE.Group();scene.add(worldGroup);worldObjects.push(worldGroup);
+  worldObjects.forEach(function(o){scene.remove(o);}); worldObjects=[];
+  debrisList=[]; fractured=false;
+  worldGroup=new THREE.Group(); scene.add(worldGroup); worldObjects.push(worldGroup);
+
   var floor=new THREE.Mesh(new THREE.PlaneGeometry(60,500),alMat(0.30,0.88,0xaabccc));
-  floor.rotation.x=-Math.PI/2;floor.position.y=-1.0;worldGroup.add(floor);
+  floor.rotation.x=-Math.PI/2; floor.position.y=-1.0; worldGroup.add(floor);
   for(var i=-28;i<=28;i+=1.4){
     var b=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.002,500),
       new THREE.MeshStandardMaterial({color:0x8899aa,metalness:0.95,roughness:0.1}));
-    b.position.set(i,-0.998,-100);worldGroup.add(b);
+    b.position.set(i,-0.998,-100); worldGroup.add(b);
   }
   for(var side=-1;side<=1;side+=2){
-    var wall=new THREE.Mesh(new THREE.BoxGeometry(0.3,12,500),alMat(0.22,0.9,0xc0d0de));
-    wall.position.set(side*18,5,-100);worldGroup.add(wall);
+    (function(){var _m=new THREE.Mesh(new THREE.BoxGeometry(0.3,12,500),alMat(0.22,0.9,0xc0d0de));_m.position.set(side*18,5,-100);worldGroup.add(_m);})();
     for(var r=0;r<8;r++){
-      var rib=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.25,500),alMat(0.15,0.95,0xd0e0f0));
-      rib.position.set(side*18.3,-0.5+r*1.6,-100);worldGroup.add(rib);
+      (function(){var _m=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.25,500),alMat(0.15,0.95,0xd0e0f0));_m.position.set(side*18.3,-0.5+r*1.6,-100);worldGroup.add(_m);})();
     }
     for(var v=-240;v<=0;v+=20){
-      var col=new THREE.Mesh(new THREE.BoxGeometry(0.6,14,0.4),alMat(0.2,0.93,0xb0c0d0));
-      col.position.set(side*18.5,5,v);worldGroup.add(col);
+      (function(){var _m=new THREE.Mesh(new THREE.BoxGeometry(0.6,14,0.4),alMat(0.2,0.93,0xb0c0d0));_m.position.set(side*18.5,5,v);worldGroup.add(_m);})();
     }
   }
   var ceil=new THREE.Mesh(new THREE.PlaneGeometry(40,500),alMat(0.35,0.85,0x99aabb));
-  ceil.rotation.x=Math.PI/2;ceil.position.y=11;worldGroup.add(ceil);
+  ceil.rotation.x=Math.PI/2; ceil.position.y=11; worldGroup.add(ceil);
   for(var cr=-19;cr<=19;cr+=3.5){
-    var crib=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,500),alMat(0.12,0.96,0xc8d8e8));
-    crib.position.set(cr,10.85,-100);worldGroup.add(crib);
+    (function(){var _m=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,500),alMat(0.12,0.96,0xc8d8e8));_m.position.set(cr,10.85,-100);worldGroup.add(_m);})();
   }
   for(var sl=-240;sl<=0;sl+=15){
     var lm=new THREE.MeshStandardMaterial({color:0xddeeff,emissive:0xaaccff,emissiveIntensity:0.8,metalness:0.1,roughness:0.9});
-    var li=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.1,4),lm);
-    li.position.set(0,10.5,sl);worldGroup.add(li);
+    (function(){var _m=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.1,4),lm);_m.position.set(0,10.5,sl);worldGroup.add(_m);})();
   }
-  var ew=new THREE.Mesh(new THREE.PlaneGeometry(40,14),alMat(0.4,0.8,0x8899aa));
-  ew.position.set(0,5,-248);worldGroup.add(ew);
+  (function(){var _m=new THREE.Mesh(new THREE.PlaneGeometry(40,14),alMat(0.4,0.8,0x8899aa));_m.position.set(0,5,-248);worldGroup.add(_m);})();
 }
 
 function genCurve(N){
-  N=N||400;var out=[];
+  N=N||400; var out=[];
   var E=70000,eY=0.004,sY=280,sUTS=440,eUTS=0.12;
   for(var i=0;i<=N;i++){
     var t=i/N,strain,stress,region;
@@ -606,37 +751,31 @@ function genCurve(N){
       stress=sUTS-(sUTS-sY)*Math.exp(-22*(strain-eY));
       region=tl>0.88?'n':'p';
     }
-    out.push({strain:strain,stress:stress,region:region});
+    out.push({strain,stress,region});
   }
   return out;
 }
 
 function toTrack(pts){
   var mxS=0;for(var i=0;i<pts.length;i++)if(pts[i].stress>mxS)mxS=pts[i].stress;
-  var N=pts.length,out=[];
-  for(var i=0;i<N;i++){
-    var t=i/(N-1),p=pts[i];
-    var z=-t*220,y=(p.stress/mxS)*7;
-    var x=Math.sin(t*Math.PI*2.5)*3.5;
-    var bank=-Math.cos(t*Math.PI*2.5)*3.5*1.2;
-    out.push({x:x,y:y,z:z,bank:bank,stress:p.stress,strain:p.strain,region:p.region});
-  }
-  return out;
+  return pts.map(function(p,i){
+    var t=i/(pts.length-1);
+    return{x:Math.sin(t*Math.PI*2.5)*3.5,y:(p.stress/mxS)*7,z:-t*220,
+      bank:-Math.cos(t*Math.PI*2.5)*3.5*1.2,stress:p.stress,strain:p.strain,region:p.region};
+  });
 }
 
-var CMAP={e:new THREE.Color(0x7eb8f7),p:new THREE.Color(0xf5c542),n:new THREE.Color(0xff5f6d)};
+var CMAP3={e:new THREE.Color(0x7eb8f7),p:new THREE.Color(0xf5c542),n:new THREE.Color(0xff5f6d)};
 
 function buildTrack(track){
-  trackObjects.forEach(function(o){scene.remove(o);});trackObjects=[];
+  trackObjects.forEach(function(o){scene.remove(o);}); trackObjects=[];
   for(var side=-1;side<=1;side+=2){
     var positions=[],colors=[];
     for(var i=0;i<track.length;i++){
-      var p=track[i],ref=i<track.length-1?i:i-1;
-      var nx=track[ref+1<=track.length-1?ref+1:ref];
-      var ddx=nx.x-track[ref].x,ddz=nx.z-track[ref].z;
-      var len=Math.sqrt(ddx*ddx+ddz*ddz)||1;
+      var p=track[i],ref=Math.min(i,track.length-2),nx=track[ref+1];
+      var ddx=nx.x-track[ref].x,ddz=nx.z-track[ref].z,len=Math.sqrt(ddx*ddx+ddz*ddz)||1;
       positions.push(p.x+side*(-ddz/len)*0.5,p.y,p.z+side*(ddx/len)*0.5);
-      var c=CMAP[p.region]||CMAP['e'];colors.push(c.r,c.g,c.b);
+      var c=CMAP3[p.region]||CMAP3['e'];colors.push(c.r,c.g,c.b);
     }
     var geo=new THREE.BufferGeometry();
     geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
@@ -644,13 +783,12 @@ function buildTrack(track){
     var line=new THREE.Line(geo,new THREE.LineBasicMaterial({vertexColors:true}));
     scene.add(line);trackObjects.push(line);
   }
-  var tGeo=new THREE.BoxGeometry(1.2,0.07,0.15);
   var tMat=new THREE.MeshStandardMaterial({color:0x889aaa,metalness:0.9,roughness:0.2});
+  var tGeo=new THREE.BoxGeometry(1.2,0.07,0.15);
   for(var i=0;i<track.length-1;i+=6){
-    var p=track[i],np=track[i+1];
     var tie=new THREE.Mesh(tGeo,tMat);
-    tie.position.set(p.x,p.y-0.12,p.z);
-    var dir=new THREE.Vector3(np.x-p.x,np.y-p.y,np.z-p.z).normalize();
+    tie.position.set(track[i].x,track[i].y-0.12,track[i].z);
+    var dir=new THREE.Vector3(track[i+1].x-track[i].x,track[i+1].y-track[i].y,track[i+1].z-track[i].z).normalize();
     if(dir.lengthSq()>0.001)tie.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),dir);
     scene.add(tie);trackObjects.push(tie);
   }
@@ -663,55 +801,31 @@ function triggerFracture(){
   setTimeout(function(){flash.style.transition='opacity 1.2s';flash.style.opacity='0';},80);
   setTimeout(function(){flash.style.transition='';},1400);
   if(BLE.isConnected())BLE.send('T0.0,0.0\n');
-  var sizes=[0.8,1.2,0.5,1.8,0.6,2.0,0.9,0.4,1.5,1.1,0.7,1.3,0.3,1.6,0.8,2.2,0.5,1.0,0.6,1.4];
   for(var i=0;i<40;i++){
-    var s=sizes[i%sizes.length]*(0.5+Math.random());
-    var mesh=new THREE.Mesh(new THREE.BoxGeometry(s,s*0.4,s*0.7),
-      alMat(0.15+Math.random()*0.3,0.85+Math.random()*0.1,0xa0b8c8));
-    mesh.position.set((Math.random()-0.5)*30,Math.random()*10,(Math.random()-0.5)*40-10);
+    var s=(0.5+Math.random())*[0.8,1.2,0.5,1.8,0.6,2.0,0.9,0.4,1.5,1.1][i%10];
+    var mesh=new THREE.Mesh(new THREE.BoxGeometry(s,s*0.4,s*0.7),alMat(0.15+Math.random()*0.3,0.85,0xa0b8c8));
+    mesh.position.set((Math.random()-.5)*30,Math.random()*10,(Math.random()-.5)*40-10);
     mesh.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
-    mesh.userData.vel=new THREE.Vector3((Math.random()-0.5)*0.8,Math.random()*0.6+0.1,(Math.random()-0.5)*0.8);
-    mesh.userData.rot=new THREE.Vector3((Math.random()-0.5)*0.12,(Math.random()-0.5)*0.12,(Math.random()-0.5)*0.12);
+    mesh.userData.vel=new THREE.Vector3((Math.random()-.5)*.8,Math.random()*.6+.1,(Math.random()-.5)*.8);
+    mesh.userData.rot=new THREE.Vector3((Math.random()-.5)*.12,(Math.random()-.5)*.12,(Math.random()-.5)*.12);
     scene.add(mesh);debrisList.push(mesh);
   }
   worldGroup.visible=false;
   trackObjects.forEach(function(o){o.visible=false;});
 }
 
-function drawGraph(pts,idx){
-  var cv=document.getElementById('hc'),ctx=cv.getContext('2d');
-  var W=cv.width,H=cv.height;
-  ctx.clearRect(0,0,W,H);
-  var mxS=0,mxE=0;
-  for(var i=0;i<pts.length;i++){if(pts[i].stress>mxS)mxS=pts[i].stress;if(pts[i].strain>mxE)mxE=pts[i].strain;}
-  var sx=function(e){return(e/mxE)*(W-14)+7;};
-  var sy=function(s){return H-7-(s/mxS)*(H-14);};
-  ctx.strokeStyle='#1c2233';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(7,7);ctx.lineTo(7,H-7);ctx.lineTo(W-7,H-7);ctx.stroke();
-  var cols={e:'#7eb8f7',p:'#f5c542',n:'#ff5f6d'};
-  var lr=null;ctx.lineWidth=1.5;ctx.beginPath();
-  for(var i=0;i<pts.length;i++){
-    var x=sx(pts[i].strain),y=sy(pts[i].stress);
-    if(i===0){ctx.moveTo(x,y);lr=pts[i].region;continue;}
-    if(pts[i].region!==lr){ctx.strokeStyle=cols[lr];ctx.stroke();ctx.beginPath();ctx.moveTo(x,y);lr=pts[i].region;}
-    ctx.lineTo(x,y);
-  }
-  ctx.strokeStyle=cols[lr];ctx.stroke();
-  if(idx>=0&&idx<pts.length){
-    var p=pts[idx];
-    ctx.beginPath();ctx.arc(sx(p.strain),sy(p.stress),3.5,0,Math.PI*2);
-    ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#08090b';ctx.lineWidth=1.2;ctx.stroke();
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-//  RENDER LOOP  (stereo VR scissor when vrMode=true)
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+//  RENDER LOOP
+//  VR: two scissor passes, each eye camera, canvas fills full screen edge-to-edge
+// ═══════════════════════════════════════════════════════════════════════════
 var clock=new THREE.Clock();
+
 function renderLoop(){
   requestAnimationFrame(renderLoop);
   clock.getDelta();
-  if(fractured&&debrisList.length){
+
+  // Debris physics
+  if(fractured){
     for(var i=0;i<debrisList.length;i++){
       var d=debrisList[i];
       d.userData.vel.y-=0.012;
@@ -721,23 +835,40 @@ function renderLoop(){
       d.rotation.z+=d.userData.rot.z;
     }
   }
+
+  // World stretch
   if(worldGroup){
     var t=stretchTarget;
-    worldGroup.scale.z+=(t-worldGroup.scale.z)*0.08;
-    var lat=1.0+(1.0/t-1.0)*0.3;
-    worldGroup.scale.x+=(lat-worldGroup.scale.x)*0.06;
-  }
-  if(rideState){
-    var euler=new THREE.Euler(rideState.pitch,rideState.yaw,rideState.roll,'YXZ');
-    camera.quaternion.setFromEuler(euler);
+    worldGroup.scale.z+=(t-worldGroup.scale.z)*.08;
+    worldGroup.scale.x+=(1+(1/t-1)*.3-worldGroup.scale.x)*.06;
   }
 
+  // Camera orientation
+  if(rideState){
+    camera.quaternion.setFromEuler(new THREE.Euler(rideState.pitch,rideState.yaw,rideState.roll,'YXZ'));
+  }
+
+  // Redraw HUD texture if dirty
+  if(hudDirty){drawHUD();hudDirty=false;}
+
   if(vrMode){
-    var W=window.innerWidth,H=window.innerHeight,HW=Math.floor(W/2);
+    // ── Stereo VR: two full-half-screen passes ──
+    // IMPORTANT: use Math.ceil for right eye to avoid 1-pixel gap from rounding
+    var HW=Math.floor(W/2);
     renderer.setScissorTest(true);
-    renderer.setScissor(0,0,HW,H);   renderer.setViewport(0,0,HW,H);   renderer.render(scene,camL);
-    renderer.setScissor(HW,0,HW,H);  renderer.setViewport(HW,0,HW,H);  renderer.render(scene,camR);
+
+    // Left eye
+    renderer.setScissor(0,0,HW,H);
+    renderer.setViewport(0,0,HW,H);
+    renderer.render(scene,camL);
+
+    // Right eye — start exactly where left ends
+    renderer.setScissor(HW,0,W-HW,H);
+    renderer.setViewport(HW,0,W-HW,H);
+    renderer.render(scene,camR);
+
     renderer.setScissorTest(false);
+    // Restore full viewport for any subsequent draws (e.g. html overlays)
     renderer.setViewport(0,0,W,H);
   } else {
     renderer.render(scene,camera);
@@ -745,21 +876,21 @@ function renderLoop(){
 }
 renderLoop();
 
-// ═══════════════════════════════════════════════════════
-//  RIDE STEP  —  closed-loop scheduler
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+//  RIDE STEP
+// ═══════════════════════════════════════════════════════════════════════════
 function startRide(track,curve){
-  rideState={track:track,curve:curve,idx:0,running:true,speed:0.4,yaw:0,pitch:0,roll:0};
+  rideState={track,curve,idx:0,running:true,speed:0.4,yaw:0,pitch:0,roll:0};
   stretchTarget=1.0;fractured=false;
-  var p0=track[0];camera.position.set(p0.x,p0.y+1.6,p0.z);
-  drawGraph(curve,0);
+  camera.position.set(track[0].x,track[0].y+1.6,track[0].z);
+  hudState.curvePts=curve;hudState.curveIdx=0;hudDirty=true;
   SIM.startSending();
   rideStep();
 }
-
 var fractureTriggered=false;
 
 function rideStep(){
+  try{
   if(!rideState||!rideState.running)return;
   if(SIM.isLagging()){setTimeout(rideStep,SIM.getRetryMs());return;}
 
@@ -767,6 +898,7 @@ function rideStep(){
   rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
   var i=Math.floor(rideState.idx);
   var tp=track[i],cp=curve[i];
+
   if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
 
   var ai=Math.min(i+10,track.length-1),ta=track[ai];
@@ -777,12 +909,14 @@ function rideStep(){
 
   SIM.setTarget(rideState.pitch,rideState.roll);
 
+  // World stretch
   if(cp.region==='p'||cp.region==='n'){
     var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004)));
-    stretchTarget=1.0+pf*1.8;
+    stretchTarget=1+pf*1.8;
     scene.fog=new THREE.Fog(0x08090b,80+pf*120,200+pf*200);
-  } else {stretchTarget=1.0;scene.fog=new THREE.Fog(0x08090b,80,200);}
+  } else {stretchTarget=1;scene.fog=new THREE.Fog(0x08090b,80,200);}
 
+  // Fracture
   if(cp.region==='n'&&!fractureTriggered){
     var nf=(cp.strain-0.105)/(0.12-0.105);
     if(nf>0.6){
@@ -791,104 +925,87 @@ function rideStep(){
     }
   }
 
-  var RL={e:'Elastic Region',p:'Plastic Deformation',n:'Necking / Fracture'};
-  var RC={e:'re',p:'rp',n:'rn'};
-  var rEl=document.getElementById('hrg');
-  rEl.textContent=RL[cp.region];rEl.className='hrg '+(RC[cp.region]||'re');
-  document.getElementById('hs').textContent=cp.stress.toFixed(1)+' MPa';
-  document.getElementById('he').textContent=cp.strain.toFixed(4);
+  // Update HUD state
+  hudState.region=cp.region;
+  hudState.stress=cp.stress;
+  hudState.strain=cp.strain;
+  hudState.curveIdx=i;
+  hudDirty=true;
+
+  // Progress bar (HTML, shows outside VR canvas so OK on non-VR)
   document.getElementById('pgb').style.width=((rideState.idx/(track.length-1))*100).toFixed(1)+'%';
-  drawGraph(curve,i);
 
   if(i<track.length-1&&rideState.running)requestAnimationFrame(rideStep);
+  }catch(e){console.error('[rideStep]',e);}
 }
 
-// ═══════════════════════════════════════════════════════
-//  COUNTDOWN then launch
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+//  COUNTDOWN
+// ═══════════════════════════════════════════════════════════════════════════
 function runCountdown(cb){
   showScreen('screenCountdown');
-  var steps=[
-    {num:'3',label:'Get ready…'},
-    {num:'2',label:'Sit back…'},
-    {num:'1',label:'Hold on!'},
-    {num:'GO',label:''}
-  ];
+  var steps=[{num:'3',label:'Get ready…'},{num:'2',label:'Sit back…'},{num:'1',label:'Hold on!'},{num:'GO',label:''}];
   var idx=0;
   function tick(){
-    var s=steps[idx];
-    var numEl=document.getElementById('cdNum'),lblEl=document.getElementById('cdLabel');
-    numEl.style.animation='none';
-    void numEl.offsetWidth; // reflow to restart animation
-    numEl.style.animation='';
-    numEl.textContent=s.num;
-    lblEl.textContent=s.label;
-    idx++;
-    if(idx<steps.length){ setTimeout(tick,1000); }
-    else { setTimeout(function(){ cb(); },600); }
+    var s=steps[idx],ne=document.getElementById('cdNum'),le=document.getElementById('cdLabel');
+    ne.style.animation='none';void ne.offsetWidth;ne.style.animation='';
+    ne.textContent=s.num;le.textContent=s.label;idx++;
+    if(idx<steps.length)setTimeout(tick,1000);
+    else setTimeout(cb,600);
   }
   tick();
 }
 
-// ═══════════════════════════════════════════════════════
-//  RESET  —  tear down ride, return to menu
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+//  EXIT RIDE
+// ═══════════════════════════════════════════════════════════════════════════
 function exitRide(){
   if(rideState)rideState.running=false;
-  rideState=null;fractured=false;fractureTriggered=false;stretchTarget=1.0;
+  rideState=null;fractured=false;fractureTriggered=false;stretchTarget=1;
   camera.position.set(0,2,0);
   trackObjects.forEach(function(o){scene.remove(o);});trackObjects=[];
   worldObjects.forEach(function(o){scene.remove(o);});worldObjects=[];
   debrisList.forEach(function(o){scene.remove(o);});debrisList=[];
   scene.fog=new THREE.Fog(0x08090b,80,200);
-  document.getElementById('hud').classList.remove('on');
+  document.getElementById('rideControls').classList.remove('on');
   document.getElementById('pgb').style.width='0%';
   var f=document.getElementById('flash');f.style.opacity='0';f.style.transition='';
   SIM.stopSending();
   setVR(false);
+  hudVisible=false;hudDirty=true;
   showScreen('screenMenu');
 }
 
-// ═══════════════════════════════════════════════════════
-//  NAV EVENTS
-// ═══════════════════════════════════════════════════════
-
-// Game card → concept screen
-document.getElementById('gcAluminum').addEventListener('click',function(){
-  showScreen('screenConcept');
-});
-
-// Back from concept
-document.getElementById('btnBack').addEventListener('click',function(){
-  showScreen('screenMenu');
-});
-
-// START → countdown → VR ride
-document.getElementById('btnStart').addEventListener('click',function(){
-  // Pre-build while countdown plays
-  fractureTriggered=false;
-  var curve=genCurve(),track=toTrack(curve);
-  buildWorld();buildTrack(track);
-
-  runCountdown(function(){
-    // Activate fullscreen + VR split
-    if(document.documentElement.requestFullscreen){
-      document.documentElement.requestFullscreen().catch(function(){});
-    }
-    setVR(true);
-
-    // Show HUD, hide all screens
-    document.getElementById('hud').classList.add('on');
-    ['screenMenu','screenConcept','screenCountdown'].forEach(function(s){
-      document.getElementById(s).classList.add('hidden');
-    });
-
-    startRide(track,curve);
-  });
-});
-
-// Exit ride button
+// ═══════════════════════════════════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════════════════════════════════
+document.getElementById('gcAluminum').addEventListener('click',function(){showScreen('screenConcept');});
+document.getElementById('btnBack').addEventListener('click',function(){showScreen('screenMenu');});
 document.getElementById('hbk').addEventListener('click',exitRide);
+
+document.getElementById('btnStart').addEventListener('click',function(){
+  try{
+    fractureTriggered=false;
+    var curve=genCurve(),track=toTrack(curve);
+    buildWorld();buildTrack(track);
+    hudState.curvePts=curve;
+
+    runCountdown(function(){
+      try{
+        if(document.documentElement.requestFullscreen){
+          document.documentElement.requestFullscreen().catch(function(){});
+        }
+        setVR(true);
+        hudVisible=true;hudDirty=true;
+        document.getElementById('rideControls').classList.add('on');
+        ['screenMenu','screenConcept','screenCountdown'].forEach(function(s){
+          document.getElementById(s).classList.add('hidden');
+        });
+        startRide(track,curve);
+      }catch(e){console.error('[btnStart inner]',e);alert('Ride launch error: '+e.message);}
+    });
+  }catch(e){console.error('[btnStart outer]',e);alert('Build error: '+e.message);}
+});
 </script>
 </body>
 </html>
