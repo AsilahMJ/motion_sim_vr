@@ -13,16 +13,13 @@
   --text:#cdd6e8;--muted:#4a566e;--green-dim:rgba(61,220,132,.1);
 }
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Syne',sans-serif;color:var(--text)}
-
-/* Canvas fills entire screen — no gaps */
+ 
 #c{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;display:block}
-
-/* ── Screen layer system ── */
+ 
 .screen{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;
   justify-content:center;transition:opacity .5s ease;background:rgba(8,9,11,.97);overflow-y:auto;padding:24px 16px}
 .screen.hidden{opacity:0;pointer-events:none}
-
-/* ── Shared components ── */
+ 
 .logo-mark{font-size:11px;font-family:'Space Mono',monospace;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
 .logo-title{font-size:clamp(32px,7vw,58px);font-weight:800;letter-spacing:-2px;line-height:.95;color:var(--text)}
 .logo-title span{color:var(--accent)}
@@ -30,8 +27,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
 .card-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
 .mi{width:min(480px,96vw);display:flex;flex-direction:column;gap:14px}
-
-/* ── BLE button ── */
+ 
 #btConn{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);
   border-radius:10px;padding:12px 16px;cursor:pointer;transition:all .2s;width:100%;
   font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em}
@@ -43,8 +39,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 #btConn.scanning .bt-dot{background:var(--warn);animation:blink .8s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 #btStatus{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7;display:none}
-
-/* ── Game cards ── */
+ 
 .game-grid{display:flex;flex-direction:column;gap:10px}
 .game-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
   cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
@@ -63,8 +58,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 .gc-badge.soon{background:rgba(74,86,110,.15);color:var(--muted);border:1px solid var(--border)}
 .gc-arrow{margin-left:auto;color:var(--muted);font-size:18px;position:relative;z-index:1;transition:transform .18s}
 .game-card:not(.locked):hover .gc-arrow{transform:translateX(3px);color:var(--accent)}
-
-/* ── Buttons ── */
+ 
 .btn-primary{background:var(--accent);color:#07090e;border:none;border-radius:10px;
   padding:15px 22px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;
   cursor:pointer;transition:all .15s;width:100%;letter-spacing:-.2px}
@@ -74,8 +68,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
   cursor:pointer;transition:all .15s;letter-spacing:.06em}
 .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
 .hint-text{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:center;line-height:1.9}
-
-/* ── Concept screen ── */
+ 
 .concept-hero{background:var(--surface);border:1px solid var(--border);border-radius:14px;
   padding:22px 22px 18px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
 .concept-hero::after{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;
@@ -94,16 +87,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 .headset-text{display:flex;flex-direction:column;gap:4px}
 .headset-text strong{font-size:14px;font-weight:700;color:var(--accent)}
 .headset-text p{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7}
-
-/* ── Countdown ── */
+ 
 #screenCountdown{background:rgba(8,9,11,.98)}
 .countdown-num{font-size:clamp(120px,30vw,220px);font-weight:800;color:var(--accent);
   line-height:1;letter-spacing:-8px;animation:countPop .4s cubic-bezier(.2,1.4,.4,1) forwards}
 @keyframes countPop{from{transform:scale(1.5);opacity:0}to{transform:scale(1);opacity:1}}
 .countdown-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;
   text-transform:uppercase;color:var(--muted);margin-top:12px}
-
-/* ── In-ride HTML controls (exit button + progress only) ── */
+ 
 #rideControls{position:fixed;inset:0;z-index:100;pointer-events:none;display:none}
 #rideControls.on{display:block}
 .hbk{position:absolute;top:12px;left:50%;transform:translateX(-50%);pointer-events:all;
@@ -113,31 +104,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 .hbk:hover{color:var(--text);border-color:var(--muted)}
 .hpw{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.06)}
 #pgb{height:100%;width:0%;background:var(--accent);transition:width .08s linear}
-
-/* VR center divider */
-#vrSep{position:fixed;top:0;left:50%;width:3px;height:100%;background:#000;z-index:50;
+ 
+/* ── rPlayer-style VR: centre divider bar, no vignette overlay (handled in shader) ── */
+#vrSep{position:fixed;top:0;left:50%;width:4px;height:100%;background:#000;z-index:50;
   display:none;pointer-events:none;transform:translateX(-50%)}
-/* Cardboard lens vignette */
-#vrVig{position:fixed;inset:0;z-index:49;pointer-events:none;display:none}
-#vrVig::before,#vrVig::after{content:'';position:absolute;top:0;bottom:0;width:50%;
-  background:radial-gradient(ellipse 80% 85% at center,transparent 52%,rgba(0,0,0,.92) 100%)}
-#vrVig::before{left:0}#vrVig::after{right:0}
-
-/* Fracture flash */
+ 
+/* Off-screen post-process canvas for barrel distortion */
+#vrCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;display:none}
+ 
 #flash{position:fixed;inset:0;z-index:300;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s}
-
-/* Off-screen HUD canvas (we draw onto a texture, never shown directly) */
 #hudCanvas{display:none}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<!-- Hidden canvas we paint the HUD onto → converted to WebGL texture -->
+<!-- rPlayer barrel-distortion output canvas (shown during VR) -->
+<canvas id="vrCanvas"></canvas>
 <canvas id="hudCanvas" width="1024" height="512"></canvas>
 <div id="flash"></div>
 <div id="vrSep"></div>
-<div id="vrVig"></div>
-
+ 
 <!-- SCREEN 1: MENU -->
 <div class="screen" id="screenMenu">
   <div class="mi">
@@ -186,7 +172,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
     <div class="hint-text">BLE optional · all rides work without motion sim</div>
   </div>
 </div>
-
+ 
 <!-- SCREEN 2: CONCEPT -->
 <div class="screen hidden" id="screenConcept">
   <div class="mi">
@@ -210,28 +196,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
     <button class="btn-ghost" id="btnBack">← Back to menu</button>
   </div>
 </div>
-
+ 
 <!-- SCREEN 3: COUNTDOWN -->
 <div class="screen hidden" id="screenCountdown">
   <div class="countdown-num" id="cdNum">3</div>
   <div class="countdown-label" id="cdLabel">Get ready…</div>
 </div>
-
-<!-- In-ride HTML controls (exit + progress bar only — rest is drawn in WebGL) -->
+ 
+<!-- In-ride HTML controls -->
 <div id="rideControls">
   <button class="hbk" id="hbk">← exit ride</button>
   <div class="hpw"><div id="pgb"></div></div>
 </div>
-
+ 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
-
-// ─────────────────────────────────────────────────────────
-//  DEBUG — log BLE raw bytes to console for diagnostics
-// ─────────────────────────────────────────────────────────
+ 
 var DEBUG_BLE = true;
-
+ 
 // ─────────────────────────────────────────────────────────
 //  SCREEN MANAGER
 // ─────────────────────────────────────────────────────────
@@ -240,23 +223,16 @@ function showScreen(id){
     document.getElementById(s).classList[s===id?'remove':'add']('hidden');
   });
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
-//  BLE LAYER  — HM-10 FFE0/FFE1
-//
-//  FIXED: robust line accumulation handles \r\n split across packets.
-//  FIXED: logs raw bytes to console when DEBUG_BLE=true so you can see
-//         exactly what the HM-10 is sending.
-//
-//  Arduino sends:  "A{pitch},{roll}\r\n"   (bleSerial.println)
-//  Browser parses: strips \r, splits on \n, checks first char === 'A'
+//  BLE LAYER
 // ═══════════════════════════════════════════════════════════════════════════
 var BLE=(function(){
   var SVC ='0000ffe0-0000-1000-8000-00805f9b34fb';
   var CHAR='0000ffe1-0000-1000-8000-00805f9b34fb';
   var device=null,char=null,connected=false,rxBuf='';
   var cbRx=null,cbConn=null,cbDisc=null;
-
+ 
   function setStatus(m){
     var e=document.getElementById('btStatus');
     if(e){e.style.display='block';e.textContent=m;}
@@ -280,9 +256,8 @@ var BLE=(function(){
     for(var i=0;i<val.byteLength;i++) str+=String.fromCharCode(val.getUint8(i));
     if(DEBUG_BLE) console.log('[BLE RX raw]',JSON.stringify(str));
     rxBuf+=str;
-    // Split on \n — trim() removes any trailing \r
     var lines=rxBuf.split('\n');
-    rxBuf=lines.pop(); // keep incomplete tail
+    rxBuf=lines.pop();
     for(var i=0;i<lines.length;i++){
       var l=lines[i].replace(/\r/g,'').trim();
       if(DEBUG_BLE) console.log('[BLE RX line]',JSON.stringify(l));
@@ -319,7 +294,6 @@ var BLE=(function(){
     var bytes=new TextEncoder().encode(msg);
     for(var off=0;off<bytes.length;off+=20){
       try{
-        // Try writeValueWithoutResponse first (faster, HM-10 prefers it)
         if(char.properties&&char.properties.writeWithoutResponse){
           await char.writeValueWithoutResponse(bytes.slice(off,Math.min(off+20,bytes.length)));
         } else {
@@ -339,7 +313,7 @@ var BLE=(function(){
     onDisconnect:function(fn){cbDisc=fn;}
   };
 })();
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
 //  MOTION SIM CONTROLLER
 // ═══════════════════════════════════════════════════════════════════════════
@@ -347,24 +321,19 @@ var SIM=(function(){
   var PITCH_MAX=10.0, ROLL_MAX=10.0;
   var HOLD_DEG=2.5, SEND_MS=80, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
-
+ 
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
-
+ 
   function setTarget(pitchRad,rollRad){
     tP=clamp(THREE.MathUtils.radToDeg(pitchRad),PITCH_MAX);
     tR=clamp(THREE.MathUtils.radToDeg(rollRad),ROLL_MAX);
     hudDirty=true;
   }
-
-  // ── Parse "A{pitch},{roll}" from Arduino ──
-  // Robust: handle both "A-8.1,4.0" and edge cases
+ 
   BLE.onRxLine(function(line){
     console.log('[SIM rx]',line,'charCode0=',line.charCodeAt(0));
     var ch=line.charAt(0);
-    if(ch!=='A'){
-      console.warn('[SIM] unexpected prefix:',ch,'('+line.charCodeAt(0)+')');
-      return;
-    }
+    if(ch!=='A'){console.warn('[SIM] unexpected prefix:',ch,'('+line.charCodeAt(0)+')');return;}
     var body=line.substring(1);
     var comma=body.indexOf(',');
     if(comma<0){console.warn('[SIM] no comma in:',line);return;}
@@ -376,11 +345,8 @@ var SIM=(function(){
     hudDirty=true;
     console.log('[SIM] actual pitch='+aP+' roll='+aR+' lagging='+lagging);
   });
-
-  function sendPkt(){
-    if(!BLE.isConnected())return;
-    BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');
-  }
+ 
+  function sendPkt(){if(!BLE.isConnected())return;BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');}
   function startSending(){if(timer)clearInterval(timer);timer=setInterval(sendPkt,SEND_MS);}
   function stopSending(){
     if(timer){clearInterval(timer);timer=null;}
@@ -390,17 +356,15 @@ var SIM=(function(){
   }
   function isLagging(){return BLE.isConnected()&&lagging;}
   function getRetryMs(){return RETRY_MS;}
-
-  // Expose state for HUD drawing
   function getState(){return{tP:tP,tR:tR,aP:aP,aR:aR,lagging:lagging,
     connected:BLE.isConnected(),PITCH_MAX:PITCH_MAX,ROLL_MAX:ROLL_MAX,HOLD_DEG:HOLD_DEG};}
-
+ 
   BLE.onConnect(function(){hudDirty=true;startSending();});
   BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();hudDirty=true;});
-
+ 
   return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState};
 })();
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
 //  THREE.JS SETUP
 // ═══════════════════════════════════════════════════════════════════════════
@@ -410,15 +374,14 @@ var renderer=new THREE.WebGLRenderer({canvas:threeCanvas,antialias:true});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 renderer.setSize(W,H);
 renderer.setClearColor(0x08090b);
-
+ 
 var scene=new THREE.Scene();
 scene.fog=new THREE.Fog(0x08090b,80,200);
-
-// Main camera (used for mono mode + as parent for eye cameras)
+ 
 var camera=new THREE.PerspectiveCamera(80,W/H,0.1,600);
 camera.position.set(0,2,0);
-
-// Stereo eye cameras — offset along local X
+ 
+// Stereo eye cameras (children of main camera)
 var EYE_SEP=0.032;
 var camL=new THREE.PerspectiveCamera(80,0.5,0.1,600);
 var camR=new THREE.PerspectiveCamera(80,0.5,0.1,600);
@@ -427,90 +390,217 @@ camR.position.set( EYE_SEP,0,0);
 camera.add(camL);
 camera.add(camR);
 scene.add(camera);
-
+ 
 var vrMode=false;
-
+ 
+// ═══════════════════════════════════════════════════════════════════════════
+//  rPLAYER-STYLE BARREL DISTORTION POST-PROCESS
+//
+//  rPlayer renders each eye into a half-width render target, then applies
+//  a barrel-distortion warp pass onto the output canvas so the image looks
+//  correct through a Cardboard lens.
+//
+//  Implementation:
+//   1. Three.js renders L eye (scissor left) then R eye (scissor right)
+//      into the hidden #c canvas at full res.
+//   2. After each frame we run a 2D barrel-warp blit onto #vrCanvas using
+//      a tiny CPU-side pixel shader (fast enough at mobile res via
+//      ImageData or drawImage + CSS filter). For real rPlayer fidelity we
+//      use a WebGL2 blit shader on #vrCanvas.
+//   3. #vrCanvas is shown; #c is hidden during VR.
+// ═══════════════════════════════════════════════════════════════════════════
+var vrCanvas = document.getElementById('vrCanvas');
+var vrGL = null;   // WebGL2 context on vrCanvas
+var vrProg = null; // barrel shader program
+var vrBuf  = null; // fullscreen quad buffer
+var vrTex  = null; // texture fed from Three.js canvas
+ 
+// Barrel distortion coefficients matching rPlayer defaults
+// k1, k2 control pincushion/barrel; scale compensates zoom
+var VR_K1 = 0.22;
+var VR_K2 = 0.07;
+var VR_SCALE = 0.72;  // rPlayer uses ~0.72 to fill the lens circle
+ 
+var VR_VERT = `#version 300 es
+precision mediump float;
+in vec2 a_pos;
+out vec2 v_uv;
+void main(){
+  v_uv = a_pos * 0.5 + 0.5;
+  gl_Position = vec4(a_pos, 0.0, 1.0);
+}`;
+ 
+// rPlayer fragment: each eye occupies [0,0.5] and [0.5,1] in X.
+// We warp within each eye half independently using radial barrel correction.
+var VR_FRAG = `#version 300 es
+precision mediump float;
+uniform sampler2D u_tex;
+uniform float u_k1;
+uniform float u_k2;
+uniform float u_scale;
+in vec2 v_uv;
+out vec4 fragColor;
+ 
+vec2 barrelDistort(vec2 uv, float k1, float k2, float sc){
+  // uv in [-1,1] relative to eye centre
+  float r2 = dot(uv, uv);
+  float r4 = r2 * r2;
+  vec2 warped = uv * (1.0 + k1*r2 + k2*r4);
+  // scale back so the edges fill
+  return warped * sc;
+}
+ 
+void main(){
+  // Determine which eye we are in (left: x<0.5, right: x>=0.5)
+  float eyeX  = step(0.5, v_uv.x);            // 0 = left eye, 1 = right eye
+  float localU = v_uv.x * 2.0 - eyeX;         // [0,1] within eye half
+ 
+  // Centre in [-1,1]
+  vec2 c = vec2(localU, v_uv.y) * 2.0 - 1.0;
+ 
+  // Correct for aspect: each eye is W/2 x H → aspect = (W/2)/H
+  // We bake aspect into distortion so circles stay circular
+  // (handled by the caller passing correct scale)
+  vec2 w = barrelDistort(c, u_k1, u_k2, u_scale);
+ 
+  // Back to [0,1] within eye
+  vec2 eu = w * 0.5 + 0.5;
+ 
+  // Out-of-lens mask (dark border like rPlayer)
+  float mask = step(0.0, eu.x) * step(eu.x, 1.0) *
+               step(0.0, eu.y) * step(eu.y, 1.0);
+ 
+  // Remap to full texture coords
+  vec2 texUV = vec2((eu.x + eyeX) * 0.5, eu.y);
+ 
+  fragColor = texture(u_tex, texUV) * mask;
+}`;
+ 
+function initVRPass(){
+  vrGL = vrCanvas.getContext('webgl2', {alpha:false, antialias:false});
+  if(!vrGL){ console.warn('[VR] WebGL2 not available, barrel pass skipped'); return; }
+ 
+  function compileShader(type, src){
+    var s = vrGL.createShader(type);
+    vrGL.shaderSource(s, src);
+    vrGL.compileShader(s);
+    if(!vrGL.getShaderParameter(s, vrGL.COMPILE_STATUS))
+      console.error('[VR shader]', vrGL.getShaderInfoLog(s));
+    return s;
+  }
+  vrProg = vrGL.createProgram();
+  vrGL.attachShader(vrProg, compileShader(vrGL.VERTEX_SHADER,   VR_VERT));
+  vrGL.attachShader(vrProg, compileShader(vrGL.FRAGMENT_SHADER, VR_FRAG));
+  vrGL.linkProgram(vrProg);
+ 
+  // Fullscreen quad
+  vrBuf = vrGL.createBuffer();
+  vrGL.bindBuffer(vrGL.ARRAY_BUFFER, vrBuf);
+  vrGL.bufferData(vrGL.ARRAY_BUFFER,
+    new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), vrGL.STATIC_DRAW);
+ 
+  // Texture that will receive the Three.js canvas pixels
+  vrTex = vrGL.createTexture();
+  vrGL.bindTexture(vrGL.TEXTURE_2D, vrTex);
+  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_MIN_FILTER, vrGL.LINEAR);
+  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_MAG_FILTER, vrGL.LINEAR);
+  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_WRAP_S, vrGL.CLAMP_TO_EDGE);
+  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_WRAP_T, vrGL.CLAMP_TO_EDGE);
+}
+ 
+function runVRPass(){
+  if(!vrGL||!vrProg) return;
+ 
+  var w = vrCanvas.width, h = vrCanvas.height;
+  vrGL.viewport(0, 0, w, h);
+ 
+  // Upload latest Three.js frame as texture
+  vrGL.bindTexture(vrGL.TEXTURE_2D, vrTex);
+  vrGL.texImage2D(vrGL.TEXTURE_2D, 0, vrGL.RGBA, vrGL.RGBA,
+                  vrGL.UNSIGNED_BYTE, threeCanvas);
+ 
+  vrGL.useProgram(vrProg);
+  vrGL.bindBuffer(vrGL.ARRAY_BUFFER, vrBuf);
+ 
+  var posLoc = vrGL.getAttribLocation(vrProg, 'a_pos');
+  vrGL.enableVertexAttribArray(posLoc);
+  vrGL.vertexAttribPointer(posLoc, 2, vrGL.FLOAT, false, 0, 0);
+ 
+  vrGL.uniform1i(vrGL.getUniformLocation(vrProg, 'u_tex'), 0);
+  vrGL.uniform1f(vrGL.getUniformLocation(vrProg, 'u_k1'), VR_K1);
+  vrGL.uniform1f(vrGL.getUniformLocation(vrProg, 'u_k2'), VR_K2);
+  vrGL.uniform1f(vrGL.getUniformLocation(vrProg, 'u_scale'), VR_SCALE);
+ 
+  vrGL.drawArrays(vrGL.TRIANGLES, 0, 6);
+}
+ 
 function setVR(on){
   vrMode=on;
-  document.getElementById('vrSep').style.display=on?'block':'none';
-  document.getElementById('vrVig').style.display=on?'block':'none';
+  // Show/hide centre bar
+  document.getElementById('vrSep').style.display = on ? 'block' : 'none';
+  // Show vrCanvas (distorted output) and hide raw Three.js canvas
+  threeCanvas.style.display = on ? 'none' : 'block';
+  vrCanvas.style.display    = on ? 'block' : 'none';
   resizeCams();
 }
+ 
 function resizeCams(){
   if(vrMode){
     var hw=W/2;
     camL.aspect=hw/H; camL.updateProjectionMatrix();
     camR.aspect=hw/H; camR.updateProjectionMatrix();
+    vrCanvas.width  = W;
+    vrCanvas.height = H;
+    if(vrGL) vrGL.viewport(0,0,W,H);
   } else {
     camera.aspect=W/H;
     camera.updateProjectionMatrix();
   }
 }
+ 
 window.addEventListener('resize',function(){
   W=window.innerWidth; H=window.innerHeight;
   renderer.setSize(W,H);
   resizeCams();
   hudDirty=true;
 });
-
+ 
+// Initialise the VR post-process pass right away
+initVRPass();
+ 
 // ── Lights ──
 scene.add(new THREE.AmbientLight(0x8899bb,1.2));
 var kl=new THREE.DirectionalLight(0xc8daf0,2.5);kl.position.set(8,20,10);scene.add(kl);
 var fl=new THREE.DirectionalLight(0x6688aa,1.0);fl.position.set(-12,5,-8);scene.add(fl);
 var rl=new THREE.DirectionalLight(0xffffff,0.6);rl.position.set(0,-5,-20);scene.add(rl);
-
+ 
 function alMat(rough,metal,col){
   return new THREE.MeshStandardMaterial({color:col||0xb8c8d8,metalness:metal!==undefined?metal:0.92,roughness:rough!==undefined?rough:0.18});
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
-//  IN-SCENE HUD  — drawn onto a 2D canvas, applied as texture to a plane
-//  that always faces the camera (billboarded), anchored in clip space.
-//
-//  We maintain TWO small planes:
-//    hudPlaneL — bottom-left: stress/strain text + region label + σ-ε graph
-//    hudPlaneR — bottom-right: sim telemetry (target, actual, error)
-//
-//  Both planes are children of the camera so they move with it, and are
-//  rendered into BOTH eye viewports automatically.
+//  HUD (unchanged)
 // ═══════════════════════════════════════════════════════════════════════════
-
-// Off-screen canvas for HUD drawing
 var HUD_W=1024, HUD_H=512;
 var hudCanvas=document.getElementById('hudCanvas');
 hudCanvas.width=HUD_W; hudCanvas.height=HUD_H;
 var hctx=hudCanvas.getContext('2d');
-
-// Three.js texture that wraps the hudCanvas
+ 
 var hudTex=new THREE.CanvasTexture(hudCanvas);
 hudTex.minFilter=THREE.LinearFilter;
 hudTex.magFilter=THREE.LinearFilter;
-
-// We draw the FULL HUD onto hudCanvas and use TWO planes — left half and right half
-// Each plane shows half the hudCanvas (graph left, telemetry right)
+ 
 var hudMat=new THREE.MeshBasicMaterial({map:hudTex,transparent:true,depthTest:false,depthWrite:false});
-
-// Single wide plane showing full HUD canvas, locked to camera view
-// Position: just below centre, close to near plane
-var hudPlane=new THREE.Mesh(
-  new THREE.PlaneGeometry(1.8,0.9),
-  hudMat
-);
-// Anchor to camera — place in camera local space
-hudPlane.position.set(0,-0.28,-1.0); // slightly down, close
+var hudPlane=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.9),hudMat);
+hudPlane.position.set(0,-0.28,-1.0);
 hudPlane.renderOrder=999;
 camera.add(hudPlane);
-
+ 
 var hudVisible=false;
 var hudDirty=true;
-
-// State cache for HUD
-var hudState={
-  region:'e', stress:0, strain:0,
-  curvePts:[], curveIdx:0
-};
-
-// ── Colour palette in canvas coords ──
+ 
+var hudState={region:'e',stress:0,strain:0,curvePts:[],curveIdx:0};
+ 
 var C_BG   ='rgba(8,9,11,0.82)';
 var C_BDR  ='rgba(28,34,51,0.9)';
 var C_ACCENT='#7eb8f7';
@@ -521,54 +611,45 @@ var C_MUTED ='#4a566e';
 var C_TEXT  ='#cdd6e8';
 var REGION_COL={e:C_ACCENT,p:C_WARN,n:C_ERR};
 var REGION_LABEL={e:'ELASTIC REGION',p:'PLASTIC DEFORMATION',n:'NECKING / FRACTURE'};
-
+ 
 function drawHUD(){
   if(!hudVisible){hctx.clearRect(0,0,HUD_W,HUD_H);hudTex.needsUpdate=true;return;}
-
   hctx.clearRect(0,0,HUD_W,HUD_H);
-
-  // ── LEFT PANEL: stress/strain info + graph ──────────────────────────────
+ 
   var LX=16,LY=16,LW=490,LH=HUD_H-32;
   roundRect(hctx,LX,LY,LW,LH,18,C_BG,C_BDR);
-
-  // Material name
+ 
   hctx.font='bold 28px Syne, sans-serif';
   hctx.fillStyle=C_TEXT;
   hctx.fillText('Aluminum 6061',LX+18,LY+42);
-
-  // Region badge
+ 
   var rc=REGION_COL[hudState.region]||C_ACCENT;
-  var rl=REGION_LABEL[hudState.region]||'';
+  var rl_=REGION_LABEL[hudState.region]||'';
   hctx.font='bold 13px Space Mono, monospace';
   hctx.fillStyle=rc;
-  hctx.fillText(rl,LX+18,LY+72);
-
-  // Stress
+  hctx.fillText(rl_,LX+18,LY+72);
+ 
   hctx.font='11px Space Mono, monospace';
   hctx.fillStyle=C_MUTED;
   hctx.fillText('STRESS  σ',LX+18,LY+108);
   hctx.font='bold 32px Space Mono, monospace';
   hctx.fillStyle=C_TEXT;
   hctx.fillText(hudState.stress.toFixed(1)+' MPa',LX+18,LY+142);
-
-  // Strain
+ 
   hctx.font='11px Space Mono, monospace';
   hctx.fillStyle=C_MUTED;
   hctx.fillText('STRAIN  ε',LX+18,LY+175);
   hctx.font='bold 26px Space Mono, monospace';
   hctx.fillStyle=C_TEXT;
   hctx.fillText(hudState.strain.toFixed(4),LX+18,LY+205);
-
-  // σ–ε mini graph
+ 
   var GX=LX+14,GY=LY+225,GW=LW-28,GH=LH-240;
   drawGraph2D(hctx,GX,GY,GW,GH,hudState.curvePts,hudState.curveIdx);
-
-  // ── RIGHT PANEL: sim telemetry ──────────────────────────────────────────
+ 
   var RX=HUD_W/2+16,RY=16,RW=HUD_W/2-32,RH=HUD_H-32;
   roundRect(hctx,RX,RY,RW,RH,18,C_BG,C_BDR);
-
+ 
   var ss=SIM.getState();
-  // Status dot + label
   var dotCol=!ss.connected?C_ERR:ss.lagging?C_WARN:C_GREEN;
   hctx.beginPath();hctx.arc(RX+22,RY+28,7,0,Math.PI*2);
   hctx.fillStyle=dotCol;hctx.fill();
@@ -576,15 +657,10 @@ function drawHUD(){
   hctx.fillStyle=C_MUTED;
   var simLabel=!ss.connected?'SIM: NO BLE':ss.lagging?'SIM: CATCHING UP…':'SIM: LIVE';
   hctx.fillText(simLabel,RX+38,RY+33);
-
-  // Pitch row
-  drawSimAxis(hctx,RX+14,RY+62,RW-28,
-    'PITCH',ss.tP,ss.aP,ss.PITCH_MAX,ss.HOLD_DEG,ss.lagging,ss.connected);
-  // Roll row
-  drawSimAxis(hctx,RX+14,RY+180,RW-28,
-    'ROLL', ss.tR,ss.aR,ss.ROLL_MAX, ss.HOLD_DEG,ss.lagging,ss.connected);
-
-  // Lag warning
+ 
+  drawSimAxis(hctx,RX+14,RY+62,RW-28,'PITCH',ss.tP,ss.aP,ss.PITCH_MAX,ss.HOLD_DEG,ss.lagging,ss.connected);
+  drawSimAxis(hctx,RX+14,RY+180,RW-28,'ROLL', ss.tR,ss.aR,ss.ROLL_MAX, ss.HOLD_DEG,ss.lagging,ss.connected);
+ 
   if(ss.lagging){
     hctx.font='bold 14px Space Mono, monospace';
     hctx.fillStyle=C_WARN;
@@ -592,54 +668,27 @@ function drawHUD(){
     hctx.fillText('⏳  WAITING FOR CHAIR…',RX+RW/2,RY+RH-24);
     hctx.textAlign='left';
   }
-
   hudTex.needsUpdate=true;
 }
-
+ 
 function drawSimAxis(ctx,x,y,w,label,target,actual,maxDeg,holdDeg,lagging,connected){
-  // Label
-  ctx.font='10px Space Mono, monospace';
-  ctx.fillStyle=C_MUTED;
-  ctx.fillText(label,x,y);
-
-  // Bipolar bar background
+  ctx.font='10px Space Mono, monospace';ctx.fillStyle=C_MUTED;ctx.fillText(label,x,y);
   var BX=x,BY=y+10,BW=w,BH=16;
   ctx.fillStyle='rgba(255,255,255,0.06)';
-  roundRect(ctx,BX,BY,BW,BH,4,'rgba(255,255,255,0.06)',null);
-  ctx.fill();
-
-  // Target fill (from centre)
+  roundRect(ctx,BX,BY,BW,BH,4,'rgba(255,255,255,0.06)',null);ctx.fill();
   var tPct=Math.abs(target/maxDeg);
   var barCol=lagging?C_WARN:C_ACCENT;
-  if(target>=0){
-    ctx.fillStyle=barCol;
-    ctx.fillRect(BX+BW/2,BY+2,tPct*(BW/2),BH-4);
-  } else {
-    ctx.fillStyle=barCol;
-    var fw=tPct*(BW/2);
-    ctx.fillRect(BX+BW/2-fw,BY+2,fw,BH-4);
-  }
-  // Centre line
-  ctx.fillStyle='rgba(255,255,255,0.3)';
-  ctx.fillRect(BX+BW/2-1,BY,2,BH);
-
-  // Values row
-  ctx.font='11px Space Mono, monospace';
-  ctx.fillStyle=C_ACCENT;
+  if(target>=0){ctx.fillStyle=barCol;ctx.fillRect(BX+BW/2,BY+2,tPct*(BW/2),BH-4);}
+  else{ctx.fillStyle=barCol;var fw=tPct*(BW/2);ctx.fillRect(BX+BW/2-fw,BY+2,fw,BH-4);}
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fillRect(BX+BW/2-1,BY,2,BH);
+  ctx.font='11px Space Mono, monospace';ctx.fillStyle=C_ACCENT;
   ctx.fillText('T:'+target.toFixed(1)+'°',x,y+44);
   if(actual!==null&&connected){
-    ctx.fillStyle=C_GREEN;
-    ctx.fillText('A:'+actual.toFixed(1)+'°',x+w/2-30,y+44);
+    ctx.fillStyle=C_GREEN;ctx.fillText('A:'+actual.toFixed(1)+'°',x+w/2-30,y+44);
     var err=target-actual;
-    var eCol=Math.abs(err)>holdDeg?C_ERR:C_MUTED;
-    ctx.fillStyle=eCol;
+    ctx.fillStyle=Math.abs(err)>holdDeg?C_ERR:C_MUTED;
     ctx.fillText('Δ'+(err>=0?'+':'')+err.toFixed(1)+'°',x+w-80,y+44);
-  } else {
-    ctx.fillStyle=C_MUTED;
-    ctx.fillText('A: —',x+w/2-30,y+44);
-  }
-
-  // Actual marker on bar
+  } else {ctx.fillStyle=C_MUTED;ctx.fillText('A: —',x+w/2-30,y+44);}
   if(actual!==null&&connected){
     var aPct=actual/maxDeg;
     var mx=BX+BW/2+aPct*(BW/2);
@@ -648,7 +697,7 @@ function drawSimAxis(ctx,x,y,w,label,target,actual,maxDeg,holdDeg,lagging,connec
     ctx.fillStyle=C_GREEN;ctx.fill();
   }
 }
-
+ 
 function roundRect(ctx,x,y,w,h,r,fill,stroke){
   ctx.beginPath();
   ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
@@ -658,41 +707,30 @@ function roundRect(ctx,x,y,w,h,r,fill,stroke){
   if(fill){ctx.fillStyle=fill;ctx.fill();}
   if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}
 }
-
+ 
 function drawGraph2D(ctx,gx,gy,gw,gh,pts,idx){
   if(!pts||pts.length===0)return;
   roundRect(ctx,gx,gy,gw,gh,10,'rgba(0,0,0,0.4)','rgba(255,255,255,0.06)');
-
   var COLMAP={e:C_ACCENT,p:C_WARN,n:C_ERR};
   var mxS=0,mxE=0;
   for(var i=0;i<pts.length;i++){if(pts[i].stress>mxS)mxS=pts[i].stress;if(pts[i].strain>mxE)mxE=pts[i].strain;}
   var pad=12;
   var sx=function(e){return gx+pad+(e/mxE)*(gw-pad*2);};
   var sy=function(s){return gy+gh-pad-(s/mxS)*(gh-pad*2);};
-
-  // Axes
   ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(gx+pad,gy+pad);ctx.lineTo(gx+pad,gy+gh-pad);ctx.lineTo(gx+gw-pad,gy+gh-pad);ctx.stroke();
-
-  // Axis labels
   ctx.font='10px Space Mono, monospace';ctx.fillStyle=C_MUTED;
-  ctx.fillText('ε',gx+gw-pad-6,gy+gh-2);
-  ctx.fillText('σ',gx+2,gy+pad+4);
-
-  // Curve
+  ctx.fillText('ε',gx+gw-pad-6,gy+gh-2);ctx.fillText('σ',gx+2,gy+pad+4);
   var lr=null;ctx.lineWidth=2;
   for(var i=0;i<pts.length-1;i++){
     if(pts[i].region!==lr){
       if(lr!==null)ctx.stroke();
       ctx.beginPath();ctx.moveTo(sx(pts[i].strain),sy(pts[i].stress));
-      ctx.strokeStyle=COLMAP[pts[i].region]||C_ACCENT;
-      lr=pts[i].region;
+      ctx.strokeStyle=COLMAP[pts[i].region]||C_ACCENT;lr=pts[i].region;
     }
     ctx.lineTo(sx(pts[i+1].strain),sy(pts[i+1].stress));
   }
   if(lr!==null)ctx.stroke();
-
-  // Current position dot
   if(idx>=0&&idx<pts.length){
     var p=pts[idx];
     ctx.beginPath();ctx.arc(sx(p.strain),sy(p.stress),5,0,Math.PI*2);
@@ -700,18 +738,18 @@ function drawGraph2D(ctx,gx,gy,gw,gh,pts,idx){
     ctx.strokeStyle='#08090b';ctx.lineWidth=1.5;ctx.stroke();
   }
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
 //  WORLD
 // ═══════════════════════════════════════════════════════════════════════════
 var rideState=null,trackObjects=[],worldObjects=[],debrisList=[],fractured=false;
 var stretchTarget=1.0,worldGroup;
-
+ 
 function buildWorld(){
   worldObjects.forEach(function(o){scene.remove(o);}); worldObjects=[];
   debrisList=[]; fractured=false;
   worldGroup=new THREE.Group(); scene.add(worldGroup); worldObjects.push(worldGroup);
-
+ 
   var floor=new THREE.Mesh(new THREE.PlaneGeometry(60,500),alMat(0.30,0.88,0xaabccc));
   floor.rotation.x=-Math.PI/2; floor.position.y=-1.0; worldGroup.add(floor);
   for(var i=-28;i<=28;i+=1.4){
@@ -739,7 +777,7 @@ function buildWorld(){
   }
   (function(){var _m=new THREE.Mesh(new THREE.PlaneGeometry(40,14),alMat(0.4,0.8,0x8899aa));_m.position.set(0,5,-248);worldGroup.add(_m);})();
 }
-
+ 
 function genCurve(N){
   N=N||400; var out=[];
   var E=70000,eY=0.004,sY=280,sUTS=440,eUTS=0.12;
@@ -755,18 +793,26 @@ function genCurve(N){
   }
   return out;
 }
-
+ 
+// ── toTrack: removed 'bank' (roll) — set to 0 for all points ──
 function toTrack(pts){
   var mxS=0;for(var i=0;i<pts.length;i++)if(pts[i].stress>mxS)mxS=pts[i].stress;
   return pts.map(function(p,i){
     var t=i/(pts.length-1);
-    return{x:Math.sin(t*Math.PI*2.5)*3.5,y:(p.stress/mxS)*7,z:-t*220,
-      bank:-Math.cos(t*Math.PI*2.5)*3.5*1.2,stress:p.stress,strain:p.strain,region:p.region};
+    return{
+      x:Math.sin(t*Math.PI*2.5)*3.5,
+      y:(p.stress/mxS)*7,
+      z:-t*220,
+      bank:0,          // ← roll removed: was -Math.cos(t*Math.PI*2.5)*3.5*1.2
+      stress:p.stress,
+      strain:p.strain,
+      region:p.region
+    };
   });
 }
-
+ 
 var CMAP3={e:new THREE.Color(0x7eb8f7),p:new THREE.Color(0xf5c542),n:new THREE.Color(0xff5f6d)};
-
+ 
 function buildTrack(track){
   trackObjects.forEach(function(o){scene.remove(o);}); trackObjects=[];
   for(var side=-1;side<=1;side+=2){
@@ -793,7 +839,7 @@ function buildTrack(track){
     scene.add(tie);trackObjects.push(tie);
   }
 }
-
+ 
 function triggerFracture(){
   fractured=true;
   var flash=document.getElementById('flash');
@@ -813,18 +859,16 @@ function triggerFracture(){
   worldGroup.visible=false;
   trackObjects.forEach(function(o){o.visible=false;});
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
-//  RENDER LOOP
-//  VR: two scissor passes, each eye camera, canvas fills full screen edge-to-edge
+//  RENDER LOOP — stereo scissor pass → rPlayer barrel blit
 // ═══════════════════════════════════════════════════════════════════════════
 var clock=new THREE.Clock();
-
+ 
 function renderLoop(){
   requestAnimationFrame(renderLoop);
   clock.getDelta();
-
-  // Debris physics
+ 
   if(fractured){
     for(var i=0;i<debrisList.length;i++){
       var d=debrisList[i];
@@ -835,47 +879,45 @@ function renderLoop(){
       d.rotation.z+=d.userData.rot.z;
     }
   }
-
-  // World stretch
+ 
   if(worldGroup){
     var t=stretchTarget;
     worldGroup.scale.z+=(t-worldGroup.scale.z)*.08;
     worldGroup.scale.x+=(1+(1/t-1)*.3-worldGroup.scale.x)*.06;
   }
-
-  // Camera orientation
+ 
   if(rideState){
-    camera.quaternion.setFromEuler(new THREE.Euler(rideState.pitch,rideState.yaw,rideState.roll,'YXZ'));
+    // Roll is zeroed — only pitch and yaw drive the camera
+    camera.quaternion.setFromEuler(new THREE.Euler(rideState.pitch,rideState.yaw,0,'YXZ'));
   }
-
-  // Redraw HUD texture if dirty
+ 
   if(hudDirty){drawHUD();hudDirty=false;}
-
+ 
   if(vrMode){
-    // ── Stereo VR: two full-half-screen passes ──
-    // IMPORTANT: use Math.ceil for right eye to avoid 1-pixel gap from rounding
+    // ── Step 1: render stereo into Three.js canvas (hidden) ──
     var HW=Math.floor(W/2);
     renderer.setScissorTest(true);
-
-    // Left eye
+ 
     renderer.setScissor(0,0,HW,H);
     renderer.setViewport(0,0,HW,H);
     renderer.render(scene,camL);
-
-    // Right eye — start exactly where left ends
+ 
     renderer.setScissor(HW,0,W-HW,H);
     renderer.setViewport(HW,0,W-HW,H);
     renderer.render(scene,camR);
-
+ 
     renderer.setScissorTest(false);
-    // Restore full viewport for any subsequent draws (e.g. html overlays)
     renderer.setViewport(0,0,W,H);
+ 
+    // ── Step 2: barrel-distortion blit onto vrCanvas ──
+    runVRPass();
+ 
   } else {
     renderer.render(scene,camera);
   }
 }
 renderLoop();
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
 //  RIDE STEP
 // ═══════════════════════════════════════════════════════════════════════════
@@ -888,35 +930,36 @@ function startRide(track,curve){
   rideStep();
 }
 var fractureTriggered=false;
-
+ 
 function rideStep(){
   try{
   if(!rideState||!rideState.running)return;
   if(SIM.isLagging()){setTimeout(rideStep,SIM.getRetryMs());return;}
-
+ 
   var track=rideState.track,curve=rideState.curve;
   rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
   var i=Math.floor(rideState.idx);
   var tp=track[i],cp=curve[i];
-
+ 
   if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
-
+ 
   var ai=Math.min(i+10,track.length-1),ta=track[ai];
   var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
   rideState.yaw  =Math.atan2(dx,-dz);
   rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
-  rideState.roll =THREE.MathUtils.degToRad(tp.bank);
-
-  SIM.setTarget(rideState.pitch,rideState.roll);
-
-  // World stretch
+  // Roll is kept at zero — bank is already 0 in toTrack(), but we also zero
+  // the camera roll explicitly here for safety
+  rideState.roll = 0;
+ 
+  // Send only pitch to SIM (no roll from curve); roll channel stays 0
+  SIM.setTarget(rideState.pitch, 0);
+ 
   if(cp.region==='p'||cp.region==='n'){
     var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004)));
     stretchTarget=1+pf*1.8;
     scene.fog=new THREE.Fog(0x08090b,80+pf*120,200+pf*200);
   } else {stretchTarget=1;scene.fog=new THREE.Fog(0x08090b,80,200);}
-
-  // Fracture
+ 
   if(cp.region==='n'&&!fractureTriggered){
     var nf=(cp.strain-0.105)/(0.12-0.105);
     if(nf>0.6){
@@ -924,21 +967,19 @@ function rideStep(){
       setTimeout(function(){if(rideState)rideState.running=false;},3000);
     }
   }
-
-  // Update HUD state
+ 
   hudState.region=cp.region;
   hudState.stress=cp.stress;
   hudState.strain=cp.strain;
   hudState.curveIdx=i;
   hudDirty=true;
-
-  // Progress bar (HTML, shows outside VR canvas so OK on non-VR)
+ 
   document.getElementById('pgb').style.width=((rideState.idx/(track.length-1))*100).toFixed(1)+'%';
-
+ 
   if(i<track.length-1&&rideState.running)requestAnimationFrame(rideStep);
   }catch(e){console.error('[rideStep]',e);}
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
 //  COUNTDOWN
 // ═══════════════════════════════════════════════════════════════════════════
@@ -955,7 +996,7 @@ function runCountdown(cb){
   }
   tick();
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
 //  EXIT RIDE
 // ═══════════════════════════════════════════════════════════════════════════
@@ -975,21 +1016,21 @@ function exitRide(){
   hudVisible=false;hudDirty=true;
   showScreen('screenMenu');
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════════════════
 //  NAV
 // ═══════════════════════════════════════════════════════════════════════════
 document.getElementById('gcAluminum').addEventListener('click',function(){showScreen('screenConcept');});
 document.getElementById('btnBack').addEventListener('click',function(){showScreen('screenMenu');});
 document.getElementById('hbk').addEventListener('click',exitRide);
-
+ 
 document.getElementById('btnStart').addEventListener('click',function(){
   try{
     fractureTriggered=false;
     var curve=genCurve(),track=toTrack(curve);
     buildWorld();buildTrack(track);
     hudState.curvePts=curve;
-
+ 
     runCountdown(function(){
       try{
         if(document.documentElement.requestFullscreen){
