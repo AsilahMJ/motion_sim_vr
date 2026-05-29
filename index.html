@@ -105,12 +105,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 .hpw{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.06)}
 #pgb{height:100%;width:0%;background:var(--accent);transition:width .08s linear}
  
-/* ── rPlayer-style VR: centre divider bar, no vignette overlay (handled in shader) ── */
+/* ── VR: centre divider bar ── */
 #vrSep{position:fixed;top:0;left:50%;width:4px;height:100%;background:#000;z-index:50;
   display:none;pointer-events:none;transform:translateX(-50%)}
- 
-/* Off-screen post-process canvas for barrel distortion */
-#vrCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;display:none}
  
 #flash{position:fixed;inset:0;z-index:300;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s}
 #hudCanvas{display:none}
@@ -118,13 +115,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 </head>
 <body>
 <canvas id="c"></canvas>
-<!-- rPlayer barrel-distortion output canvas (shown during VR) -->
-<canvas id="vrCanvas"></canvas>
 <canvas id="hudCanvas" width="1024" height="512"></canvas>
 <div id="flash"></div>
 <div id="vrSep"></div>
  
-<!-- SCREEN 1: MENU -->
 <div class="screen" id="screenMenu">
   <div class="mi">
     <div style="margin-bottom:4px">
@@ -149,20 +143,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
           </div>
           <div class="gc-arrow">›</div>
         </div>
+        
+        <div class="game-card" id="gcReynolds">
+          <div class="gc-icon">🌊</div>
+          <div class="gc-body">
+            <div class="gc-title">Fluid Flow</div>
+            <div class="gc-desc">Input a Reynolds Number · Laminar to Turbulent</div>
+            <div class="gc-badge available" style="background:rgba(61,220,132,.12);color:var(--green);border-color:rgba(61,220,132,.25)">Available</div>
+          </div>
+          <div class="gc-arrow">›</div>
+        </div>
+        
         <div class="game-card locked">
           <div class="gc-icon">🧪</div>
           <div class="gc-body">
             <div class="gc-title">Steel 1045</div>
             <div class="gc-desc">High-carbon steel with distinct yield point</div>
-            <div class="gc-badge soon">Coming Soon</div>
-          </div>
-          <div class="gc-arrow">›</div>
-        </div>
-        <div class="game-card locked">
-          <div class="gc-icon">🧬</div>
-          <div class="gc-body">
-            <div class="gc-title">Polymer (HDPE)</div>
-            <div class="gc-desc">Viscoelastic behaviour &amp; cold drawing</div>
             <div class="gc-badge soon">Coming Soon</div>
           </div>
           <div class="gc-arrow">›</div>
@@ -173,7 +169,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
   </div>
 </div>
  
-<!-- SCREEN 2: CONCEPT -->
 <div class="screen hidden" id="screenConcept">
   <div class="mi">
     <div class="concept-hero">
@@ -196,14 +191,45 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
     <button class="btn-ghost" id="btnBack">← Back to menu</button>
   </div>
 </div>
+
+<div class="screen hidden" id="screenConceptReynolds">
+  <div class="mi">
+    <div class="concept-hero">
+      <div class="concept-number">Experience 02 / Fluid Dynamics</div>
+      <div class="concept-title">Reynolds Number<br>Flow Simulator</div>
+      <div class="concept-meta">Pipe flow simulation · Re = ρvD/μ<br>Accelerate to your target Reynolds number!</div>
+      <div class="region-pills">
+        <div class="pill e" style="background:rgba(61,220,132,.12);color:var(--green);border-color:rgba(61,220,132,.2)">Laminar</div>
+        <div class="pill p">Transitional</div>
+        <div class="pill n">Turbulent</div>
+      </div>
+      
+      <div style="margin-top:14px; background:rgba(0,0,0,0.2); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+        <label style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); display:flex; justify-content:space-between;">
+          <span>Target Max Reynolds (Re):</span>
+          <strong id="reVal" style="color:var(--accent); font-size:12px;">6000</strong>
+        </label>
+        <input type="range" id="reInput" min="1000" max="12000" step="100" value="6000" style="width:100%; margin-top:8px; accent-color:var(--accent);">
+      </div>
+
+    </div>
+    <div class="headset-prompt">
+      <div class="headset-icon">🥽</div>
+      <div class="headset-text">
+        <strong>Place your phone in the VR headset</strong>
+        <p>Insert phone into Google Cardboard before pressing Start.<br>The screen splits automatically when the ride begins.</p>
+      </div>
+    </div>
+    <button class="btn-primary" id="btnStartReynolds">START RIDE  →</button>
+    <button class="btn-ghost" id="btnBackReynolds">← Back to menu</button>
+  </div>
+</div>
  
-<!-- SCREEN 3: COUNTDOWN -->
 <div class="screen hidden" id="screenCountdown">
   <div class="countdown-num" id="cdNum">3</div>
   <div class="countdown-label" id="cdLabel">Get ready…</div>
 </div>
  
-<!-- In-ride HTML controls -->
 <div id="rideControls">
   <button class="hbk" id="hbk">← exit ride</button>
   <div class="hpw"><div id="pgb"></div></div>
@@ -214,13 +240,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 'use strict';
  
 var DEBUG_BLE = true;
+var currentRide = 'aluminum';
  
 // ─────────────────────────────────────────────────────────
 //  SCREEN MANAGER
 // ─────────────────────────────────────────────────────────
 function showScreen(id){
-  ['screenMenu','screenConcept','screenCountdown'].forEach(function(s){
-    document.getElementById(s).classList[s===id?'remove':'add']('hidden');
+  ['screenMenu','screenConcept','screenConceptReynolds','screenCountdown'].forEach(function(s){
+    var el = document.getElementById(s);
+    if(el) el.classList[s===id?'remove':'add']('hidden');
   });
 }
  
@@ -382,7 +410,7 @@ var camera=new THREE.PerspectiveCamera(80,W/H,0.1,600);
 camera.position.set(0,2,0);
  
 // Stereo eye cameras (children of main camera)
-var EYE_SEP=0.015;
+var EYE_SEP=0.015; // Adjusted for better convergence
 var camL=new THREE.PerspectiveCamera(80,0.5,0.1,600);
 var camR=new THREE.PerspectiveCamera(80,0.5,0.1,600);
 camL.position.set(-EYE_SEP,0,0);
@@ -392,181 +420,20 @@ camera.add(camR);
 scene.add(camera);
  
 var vrMode=false;
- 
-// ═══════════════════════════════════════════════════════════════════════════
-//  rPLAYER-STYLE BARREL DISTORTION POST-PROCESS
-//
-//  rPlayer renders each eye into a half-width render target, then applies
-//  a barrel-distortion warp pass onto the output canvas so the image looks
-//  correct through a Cardboard lens.
-//
-//  Implementation:
-//   1. Three.js renders L eye (scissor left) then R eye (scissor right)
-//      into the hidden #c canvas at full res.
-//   2. After each frame we run a 2D barrel-warp blit onto #vrCanvas using
-//      a tiny CPU-side pixel shader (fast enough at mobile res via
-//      ImageData or drawImage + CSS filter). For real rPlayer fidelity we
-//      use a WebGL2 blit shader on #vrCanvas.
-//   3. #vrCanvas is shown; #c is hidden during VR.
-// ═══════════════════════════════════════════════════════════════════════════
-var vrCanvas = document.getElementById('vrCanvas');
-var vrGL = null;   // WebGL2 context on vrCanvas
-var vrProg = null; // barrel shader program
-var vrBuf  = null; // fullscreen quad buffer
-var vrTex  = null; // texture fed from Three.js canvas
- 
-// Barrel distortion coefficients matching rPlayer defaults
-// k1, k2 control pincushion/barrel; scale compensates zoom
-var VR_K1 = 0.22;
-var VR_K2 = 0.07;
-var VR_SCALE = 0.72;  // rPlayer uses ~0.72 to fill the lens circle
- 
-var VR_VERT = `#version 300 es
-precision mediump float;
-in vec2 a_pos;
-out vec2 v_uv;
-void main(){
-  // Flip Y: canvas pixels are top-left origin, WebGL textures are bottom-left.
-  // Without this flip the blit appears upside-down.
-  v_uv = vec2(a_pos.x * 0.5 + 0.5, 1.0 - (a_pos.y * 0.5 + 0.5));
-  gl_Position = vec4(a_pos, 0.0, 1.0);
-}`;
- 
-// rPlayer fragment: each eye occupies [0,0.5] and [0.5,1] in X.
-// We warp within each eye half independently using radial barrel correction.
-var VR_FRAG = `#version 300 es
-precision mediump float;
-uniform sampler2D u_tex;
-uniform float u_k1;
-uniform float u_k2;
-uniform float u_scale;
-in vec2 v_uv;
-out vec4 fragColor;
- 
-vec2 barrelDistort(vec2 uv, float k1, float k2, float sc){
-  // uv in [-1,1] relative to eye centre
-  float r2 = dot(uv, uv);
-  float r4 = r2 * r2;
-  vec2 warped = uv * (1.0 + k1*r2 + k2*r4);
-  // scale back so the edges fill
-  return warped * sc;
-}
- 
-void main(){
-  // Determine which eye we are in (left: x<0.5, right: x>=0.5)
-  float eyeX  = step(0.5, v_uv.x);            // 0 = left eye, 1 = right eye
-  float localU = v_uv.x * 2.0 - eyeX;         // [0,1] within eye half
- 
-  // Centre in [-1,1]
-  vec2 c = vec2(localU, v_uv.y) * 2.0 - 1.0;
- 
-  // Correct for aspect: each eye is W/2 x H → aspect = (W/2)/H
-  // We bake aspect into distortion so circles stay circular
-  // (handled by the caller passing correct scale)
-  vec2 w = barrelDistort(c, u_k1, u_k2, u_scale);
- 
-  // Back to [0,1] within eye
-  vec2 eu = w * 0.5 + 0.5;
- 
-  // Out-of-lens mask (dark border like rPlayer)
-  float mask = step(0.0, eu.x) * step(eu.x, 1.0) *
-               step(0.0, eu.y) * step(eu.y, 1.0);
- 
-  // Remap to full texture coords
-  vec2 texUV = vec2((eu.x + eyeX) * 0.5, eu.y);
- 
-  fragColor = texture(u_tex, texUV) * mask;
-}`;
- 
-function initVRPass(){
-  vrGL = vrCanvas.getContext('webgl2', {alpha:false, antialias:false});
-  if(!vrGL){ console.warn('[VR] WebGL2 not available, barrel pass skipped'); return; }
- 
-  function compileShader(type, src){
-    var s = vrGL.createShader(type);
-    vrGL.shaderSource(s, src);
-    vrGL.compileShader(s);
-    if(!vrGL.getShaderParameter(s, vrGL.COMPILE_STATUS))
-      console.error('[VR shader]', vrGL.getShaderInfoLog(s));
-    return s;
-  }
-  vrProg = vrGL.createProgram();
-  vrGL.attachShader(vrProg, compileShader(vrGL.VERTEX_SHADER,   VR_VERT));
-  vrGL.attachShader(vrProg, compileShader(vrGL.FRAGMENT_SHADER, VR_FRAG));
-  vrGL.linkProgram(vrProg);
- 
-  // Fullscreen quad
-  vrBuf = vrGL.createBuffer();
-  vrGL.bindBuffer(vrGL.ARRAY_BUFFER, vrBuf);
-  vrGL.bufferData(vrGL.ARRAY_BUFFER,
-    new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), vrGL.STATIC_DRAW);
- 
-  // Texture that will receive the Three.js canvas pixels
-  vrTex = vrGL.createTexture();
-  vrGL.bindTexture(vrGL.TEXTURE_2D, vrTex);
-  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_MIN_FILTER, vrGL.LINEAR);
-  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_MAG_FILTER, vrGL.LINEAR);
-  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_WRAP_S, vrGL.CLAMP_TO_EDGE);
-  vrGL.texParameteri(vrGL.TEXTURE_2D, vrGL.TEXTURE_WRAP_T, vrGL.CLAMP_TO_EDGE);
-}
- 
-function runVRPass(){
-  if(!vrGL||!vrProg) return;
- 
-  var w = vrCanvas.width, h = vrCanvas.height;
-  vrGL.viewport(0, 0, w, h);
- 
-  // Upload latest Three.js frame as texture
-  vrGL.bindTexture(vrGL.TEXTURE_2D, vrTex);
-  vrGL.texImage2D(vrGL.TEXTURE_2D, 0, vrGL.RGBA, vrGL.RGBA,
-                  vrGL.UNSIGNED_BYTE, threeCanvas);
- 
-  vrGL.useProgram(vrProg);
-  vrGL.bindBuffer(vrGL.ARRAY_BUFFER, vrBuf);
- 
-  var posLoc = vrGL.getAttribLocation(vrProg, 'a_pos');
-  vrGL.enableVertexAttribArray(posLoc);
-  vrGL.vertexAttribPointer(posLoc, 2, vrGL.FLOAT, false, 0, 0);
- 
-  vrGL.uniform1i(vrGL.getUniformLocation(vrProg, 'u_tex'), 0);
-  vrGL.uniform1f(vrGL.getUniformLocation(vrProg, 'u_k1'), VR_K1);
-  vrGL.uniform1f(vrGL.getUniformLocation(vrProg, 'u_k2'), VR_K2);
-  vrGL.uniform1f(vrGL.getUniformLocation(vrProg, 'u_scale'), VR_SCALE);
- 
-  vrGL.drawArrays(vrGL.TRIANGLES, 0, 6);
-}
- 
+
 function setVR(on){
   vrMode=on;
   // Show/hide centre bar
   document.getElementById('vrSep').style.display = on ? 'block' : 'none';
-  // Keep the main canvas visible and never show the distortion canvas
   threeCanvas.style.display = 'block'; 
-  vrCanvas.style.display    = 'none';
   resizeCams();
 }
  
 function resizeCams(){
   if(vrMode){
-    // Determine center and shift amount (e.g., 6% of the screen width)
-    var HW = Math.floor(W/2);
-    var shift = Math.floor(W * 0.06); // Tweak this number if you still see double
-    var eyeW = HW - shift; 
-    
-    renderer.setScissorTest(true);
- 
-    // Left Eye: Pad the far left side, shifting the image right (towards center)
-    renderer.setScissor(shift, 0, eyeW, H);
-    renderer.setViewport(shift, 0, eyeW, H);
-    renderer.render(scene,camL);
- 
-    // Right Eye: Pad the far right side, shifting the image left (towards center)
-    renderer.setScissor(HW, 0, eyeW, H);
-    renderer.setViewport(HW, 0, eyeW, H);
-    renderer.render(scene,camR);
- 
-    renderer.setScissorTest(false);
-    renderer.setViewport(0,0,W,H);
+    var hw=W/2;
+    camL.aspect=hw/H; camL.updateProjectionMatrix();
+    camR.aspect=hw/H; camR.updateProjectionMatrix();
   } else {
     camera.aspect=W/H;
     camera.updateProjectionMatrix();
@@ -580,9 +447,6 @@ window.addEventListener('resize',function(){
   hudDirty=true;
 });
  
-// Initialise the VR post-process pass right away
-initVRPass();
- 
 // ── Lights ──
 scene.add(new THREE.AmbientLight(0x8899bb,1.2));
 var kl=new THREE.DirectionalLight(0xc8daf0,2.5);kl.position.set(8,20,10);scene.add(kl);
@@ -594,7 +458,7 @@ function alMat(rough,metal,col){
 }
  
 // ═══════════════════════════════════════════════════════════════════════════
-//  HUD (unchanged)
+//  HUD
 // ═══════════════════════════════════════════════════════════════════════════
 var HUD_W=1024, HUD_H=512;
 var hudCanvas=document.getElementById('hudCanvas');
@@ -606,9 +470,10 @@ hudTex.minFilter=THREE.LinearFilter;
 hudTex.magFilter=THREE.LinearFilter;
  
 var hudMat=new THREE.MeshBasicMaterial({map:hudTex,transparent:true,depthTest:false,depthWrite:false});
+// Shrink the HUD size (width and height)
 var hudPlane=new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.5),hudMat);
+// Move the HUD higher on the Y-axis
 hudPlane.position.set(0, 0.35, -1.0);
-
 hudPlane.renderOrder=999;
 camera.add(hudPlane);
  
@@ -625,8 +490,9 @@ var C_ERR   ='#ff5f6d';
 var C_GREEN ='#3ddc84';
 var C_MUTED ='#4a566e';
 var C_TEXT  ='#cdd6e8';
-var REGION_COL={e:C_ACCENT,p:C_WARN,n:C_ERR};
-var REGION_LABEL={e:'ELASTIC REGION',p:'PLASTIC DEFORMATION',n:'NECKING / FRACTURE'};
+
+var REGION_COL={e:C_ACCENT,p:C_WARN,n:C_ERR, laminar:C_GREEN, transitional:C_WARN, turbulent:C_ERR};
+var REGION_LABEL={e:'ELASTIC REGION',p:'PLASTIC DEFORMATION',n:'NECKING / FRACTURE', laminar:'LAMINAR FLOW', transitional:'TRANSITIONAL FLOW', turbulent:'TURBULENT FLOW'};
  
 function drawHUD(){
   if(!hudVisible){hctx.clearRect(0,0,HUD_W,HUD_H);hudTex.needsUpdate=true;return;}
@@ -637,7 +503,7 @@ function drawHUD(){
  
   hctx.font='bold 28px Syne, sans-serif';
   hctx.fillStyle=C_TEXT;
-  hctx.fillText('Aluminum 6061',LX+18,LY+42);
+  hctx.fillText(currentRide === 'aluminum' ? 'Aluminum 6061' : 'Fluid Flow (Pipe)',LX+18,LY+42);
  
   var rc=REGION_COL[hudState.region]||C_ACCENT;
   var rl_=REGION_LABEL[hudState.region]||'';
@@ -647,17 +513,17 @@ function drawHUD(){
  
   hctx.font='11px Space Mono, monospace';
   hctx.fillStyle=C_MUTED;
-  hctx.fillText('STRESS  σ',LX+18,LY+108);
+  hctx.fillText(currentRide === 'aluminum' ? 'STRESS  σ' : 'REYNOLDS Re',LX+18,LY+108);
   hctx.font='bold 32px Space Mono, monospace';
   hctx.fillStyle=C_TEXT;
-  hctx.fillText(hudState.stress.toFixed(1)+' MPa',LX+18,LY+142);
+  hctx.fillText(currentRide === 'aluminum' ? hudState.stress.toFixed(1)+' MPa' : Math.floor(hudState.stress).toString(),LX+18,LY+142);
  
   hctx.font='11px Space Mono, monospace';
   hctx.fillStyle=C_MUTED;
-  hctx.fillText('STRAIN  ε',LX+18,LY+175);
+  hctx.fillText(currentRide === 'aluminum' ? 'STRAIN  ε' : 'VELOCITY v',LX+18,LY+175);
   hctx.font='bold 26px Space Mono, monospace';
   hctx.fillStyle=C_TEXT;
-  hctx.fillText(hudState.strain.toFixed(4),LX+18,LY+205);
+  hctx.fillText(currentRide === 'aluminum' ? hudState.strain.toFixed(4) : hudState.strain.toFixed(2)+' m/s',LX+18,LY+205);
  
   var GX=LX+14,GY=LY+225,GW=LW-28,GH=LH-240;
   drawGraph2D(hctx,GX,GY,GW,GH,hudState.curvePts,hudState.curveIdx);
@@ -727,7 +593,7 @@ function roundRect(ctx,x,y,w,h,r,fill,stroke){
 function drawGraph2D(ctx,gx,gy,gw,gh,pts,idx){
   if(!pts||pts.length===0)return;
   roundRect(ctx,gx,gy,gw,gh,10,'rgba(0,0,0,0.4)','rgba(255,255,255,0.06)');
-  var COLMAP={e:C_ACCENT,p:C_WARN,n:C_ERR};
+  var COLMAP={e:C_ACCENT,p:C_WARN,n:C_ERR, laminar:C_GREEN, transitional:C_WARN, turbulent:C_ERR};
   var mxS=0,mxE=0;
   for(var i=0;i<pts.length;i++){if(pts[i].stress>mxS)mxS=pts[i].stress;if(pts[i].strain>mxE)mxE=pts[i].strain;}
   var pad=12;
@@ -736,7 +602,8 @@ function drawGraph2D(ctx,gx,gy,gw,gh,pts,idx){
   ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(gx+pad,gy+pad);ctx.lineTo(gx+pad,gy+gh-pad);ctx.lineTo(gx+gw-pad,gy+gh-pad);ctx.stroke();
   ctx.font='10px Space Mono, monospace';ctx.fillStyle=C_MUTED;
-  ctx.fillText('ε',gx+gw-pad-6,gy+gh-2);ctx.fillText('σ',gx+2,gy+pad+4);
+  ctx.fillText(currentRide === 'aluminum' ? 'ε' : 'v',gx+gw-pad-6,gy+gh-2);
+  ctx.fillText(currentRide === 'aluminum' ? 'σ' : 'Re',gx+2,gy+pad+4);
   var lr=null;ctx.lineWidth=2;
   for(var i=0;i<pts.length-1;i++){
     if(pts[i].region!==lr){
@@ -794,6 +661,7 @@ function buildWorld(){
   (function(){var _m=new THREE.Mesh(new THREE.PlaneGeometry(40,14),alMat(0.4,0.8,0x8899aa));_m.position.set(0,5,-248);worldGroup.add(_m);})();
 }
  
+// ── Ride 1: Aluminum Stress-Strain ──
 function genCurve(N){
   N=N||400; var out=[];
   var E=70000,eY=0.004,sY=280,sUTS=440,eUTS=0.12;
@@ -809,8 +677,6 @@ function genCurve(N){
   }
   return out;
 }
- 
-// ── toTrack: removed 'bank' (roll) — set to 0 for all points ──
 function toTrack(pts){
   var mxS=0;for(var i=0;i<pts.length;i++)if(pts[i].stress>mxS)mxS=pts[i].stress;
   return pts.map(function(p,i){
@@ -819,15 +685,67 @@ function toTrack(pts){
       x:Math.sin(t*Math.PI*2.5)*3.5,
       y:(p.stress/mxS)*7,
       z:-t*220,
-      bank:0,          // ← roll removed: was -Math.cos(t*Math.PI*2.5)*3.5*1.2
+      bank:0,          
       stress:p.stress,
       strain:p.strain,
       region:p.region
     };
   });
 }
- 
+
+// ── Ride 2: Reynolds Fluid Flow ──
+function flowNoise(t) {
+  return Math.sin(t*43.12) + Math.sin(t*89.54)*0.5 + Math.sin(t*173.2)*0.25;
+}
+
+function genReynoldsCurve(N){
+  N=N||400; var out=[];
+  var targetRe = parseInt(document.getElementById('reInput').value) || 6000;
+  
+  for(var i=0;i<=N;i++){
+    var t=i/N;
+    var currentRe = t * targetRe; 
+    var velocity = currentRe / 1000; 
+    var region = currentRe < 2300 ? 'laminar' : (currentRe < 4000 ? 'transitional' : 'turbulent');
+    
+    out.push({strain: velocity, stress: currentRe, region: region});
+  }
+  return out;
+}
+
+function toReynoldsTrack(pts){
+  var mxS=0;for(var i=0;i<pts.length;i++)if(pts[i].stress>mxS)mxS=pts[i].stress;
+  return pts.map(function(p,i){
+    var t=i/(pts.length-1);
+    var x = 0, y = 0, z = -t*220;
+
+    if (p.region === 'laminar') {
+      x = Math.sin(t * Math.PI * 4) * 2;
+      y = Math.cos(t * Math.PI * 4) * 1;
+    } else if (p.region === 'transitional') {
+      var intensity = (p.stress - 2300) / 1700;
+      x = Math.sin(t * Math.PI * 4) * 2 + flowNoise(t * 10) * intensity * 0.4;
+      y = Math.cos(t * Math.PI * 4) * 1 + flowNoise(t * 12) * intensity * 0.4;
+    } else {
+      var intensity = Math.min(1.0, (p.stress - 4000) / 4000);
+      x = Math.sin(t * Math.PI * 4) * 2 + flowNoise(t * 15) * (0.4 + intensity * 1.5);
+      y = Math.cos(t * Math.PI * 4) * 1 + flowNoise(t * 17) * (0.4 + intensity * 1.5);
+    }
+
+    return{
+      x: x, y: y, z: z, bank: 0,
+      stress: p.stress, strain: p.strain, region: p.region
+    };
+  });
+}
+
+// ── Shared Track Building ──
 var CMAP3={e:new THREE.Color(0x7eb8f7),p:new THREE.Color(0xf5c542),n:new THREE.Color(0xff5f6d)};
+Object.assign(CMAP3, {
+  laminar: new THREE.Color(0x3ddc84),
+  transitional: new THREE.Color(0xf5c542),
+  turbulent: new THREE.Color(0xff5f6d)
+});
  
 function buildTrack(track){
   trackObjects.forEach(function(o){scene.remove(o);}); trackObjects=[];
@@ -877,7 +795,7 @@ function triggerFracture(){
 }
  
 // ═══════════════════════════════════════════════════════════════════════════
-//  RENDER LOOP — stereo scissor pass → rPlayer barrel blit
+//  RENDER LOOP — Standard side-by-side 3D
 // ═══════════════════════════════════════════════════════════════════════════
 var clock=new THREE.Clock();
  
@@ -903,31 +821,31 @@ function renderLoop(){
   }
  
   if(rideState){
-    // Roll is zeroed — only pitch and yaw drive the camera
     camera.quaternion.setFromEuler(new THREE.Euler(rideState.pitch,rideState.yaw,0,'YXZ'));
   }
  
   if(hudDirty){drawHUD();hudDirty=false;}
  
   if(vrMode){
-    // ── Step 1: render stereo into Three.js canvas (hidden) ──
-    var HW=Math.floor(W/2);
+    // Render standard side-by-side stereoscopic 3D
+    var HW = Math.floor(W/2);
+    var shift = Math.floor(W * 0.06); // Shift inward for proper divergence
+    var eyeW = HW - shift; 
+    
     renderer.setScissorTest(true);
  
-    renderer.setScissor(0,0,HW,H);
-    renderer.setViewport(0,0,HW,H);
+    // Left Eye
+    renderer.setScissor(shift, 0, eyeW, H);
+    renderer.setViewport(shift, 0, eyeW, H);
     renderer.render(scene,camL);
  
-    renderer.setScissor(HW,0,W-HW,H);
-    renderer.setViewport(HW,0,W-HW,H);
+    // Right Eye
+    renderer.setScissor(HW, 0, eyeW, H);
+    renderer.setViewport(HW, 0, eyeW, H);
     renderer.render(scene,camR);
  
     renderer.setScissorTest(false);
     renderer.setViewport(0,0,W,H);
- 
-    // ── Step 2: barrel-distortion blit onto vrCanvas ──
-    runVRPass();
- 
   } else {
     renderer.render(scene,camera);
   }
@@ -963,15 +881,13 @@ function rideStep(){
   var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
   rideState.yaw  =Math.atan2(dx,-dz);
   rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
-  // Roll is kept at zero — bank is already 0 in toTrack(), but we also zero
-  // the camera roll explicitly here for safety
   rideState.roll = 0;
  
-  // Send only pitch to SIM (no roll from curve); roll channel stays 0
   SIM.setTarget(rideState.pitch, 0);
  
-  if(cp.region==='p'||cp.region==='n'){
-    var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004)));
+  if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
+    var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; // slight fog adjustment for fluid
+    var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004))) * factor;
     stretchTarget=1+pf*1.8;
     scene.fog=new THREE.Fog(0x08090b,80+pf*120,200+pf*200);
   } else {stretchTarget=1;scene.fog=new THREE.Fog(0x08090b,80,200);}
@@ -1034,12 +950,13 @@ function exitRide(){
 }
  
 // ═══════════════════════════════════════════════════════════════════════════
-//  NAV
+//  NAV & LAUNCH LOGIC
 // ═══════════════════════════════════════════════════════════════════════════
-document.getElementById('gcAluminum').addEventListener('click',function(){showScreen('screenConcept');});
-document.getElementById('btnBack').addEventListener('click',function(){showScreen('screenMenu');});
 document.getElementById('hbk').addEventListener('click',exitRide);
- 
+
+// Aluminum Ride
+document.getElementById('gcAluminum').addEventListener('click',function(){ currentRide = 'aluminum'; showScreen('screenConcept');});
+document.getElementById('btnBack').addEventListener('click',function(){showScreen('screenMenu');});
 document.getElementById('btnStart').addEventListener('click',function(){
   try{
     fractureTriggered=false;
@@ -1055,13 +972,43 @@ document.getElementById('btnStart').addEventListener('click',function(){
         setVR(true);
         hudVisible=true;hudDirty=true;
         document.getElementById('rideControls').classList.add('on');
-        ['screenMenu','screenConcept','screenCountdown'].forEach(function(s){
+        ['screenMenu','screenConcept','screenConceptReynolds','screenCountdown'].forEach(function(s){
           document.getElementById(s).classList.add('hidden');
         });
         startRide(track,curve);
       }catch(e){console.error('[btnStart inner]',e);alert('Ride launch error: '+e.message);}
     });
   }catch(e){console.error('[btnStart outer]',e);alert('Build error: '+e.message);}
+});
+
+// Reynolds Fluid Ride
+document.getElementById('gcReynolds').addEventListener('click',function(){ currentRide = 'reynolds'; showScreen('screenConceptReynolds');});
+document.getElementById('btnBackReynolds').addEventListener('click',function(){showScreen('screenMenu');});
+document.getElementById('reInput').addEventListener('input', function(e) {
+  document.getElementById('reVal').textContent = e.target.value;
+});
+document.getElementById('btnStartReynolds').addEventListener('click',function(){
+  try{
+    fractureTriggered=false;
+    var curve=genReynoldsCurve(), track=toReynoldsTrack(curve);
+    buildWorld(); buildTrack(track);
+    hudState.curvePts=curve;
+ 
+    runCountdown(function(){
+      try{
+        if(document.documentElement.requestFullscreen){
+          document.documentElement.requestFullscreen().catch(function(){});
+        }
+        setVR(true);
+        hudVisible=true;hudDirty=true;
+        document.getElementById('rideControls').classList.add('on');
+        ['screenMenu','screenConcept','screenConceptReynolds','screenCountdown'].forEach(function(s){
+          document.getElementById(s).classList.add('hidden');
+        });
+        startRide(track,curve);
+      }catch(e){console.error('[btnStartReynolds inner]',e);alert('Ride launch error: '+e.message);}
+    });
+  }catch(e){console.error('[btnStartReynolds outer]',e);alert('Build error: '+e.message);}
 });
 </script>
 </body>
