@@ -540,20 +540,31 @@ function setVR(on){
   vrMode=on;
   // Show/hide centre bar
   document.getElementById('vrSep').style.display = on ? 'block' : 'none';
-  // Show vrCanvas (distorted output) and hide raw Three.js canvas
-  threeCanvas.style.display = on ? 'none' : 'block';
-  vrCanvas.style.display    = on ? 'block' : 'none';
+  // Keep the main canvas visible and never show the distortion canvas
+  threeCanvas.style.display = 'block'; 
+  vrCanvas.style.display    = 'none';
   resizeCams();
 }
  
 function resizeCams(){
   if(vrMode){
-    var hw=W/2;
-    camL.aspect=hw/H; camL.updateProjectionMatrix();
-    camR.aspect=hw/H; camR.updateProjectionMatrix();
-    vrCanvas.width  = W;
-    vrCanvas.height = H;
-    if(vrGL) vrGL.viewport(0,0,W,H);
+    // Render standard side-by-side stereoscopic 3D
+    var HW=Math.floor(W/2);
+    renderer.setScissorTest(true);
+ 
+    // Left Eye
+    renderer.setScissor(0,0,HW,H);
+    renderer.setViewport(0,0,HW,H);
+    renderer.render(scene,camL);
+ 
+    // Right Eye
+    renderer.setScissor(HW,0,W-HW,H);
+    renderer.setViewport(HW,0,W-HW,H);
+    renderer.render(scene,camR);
+ 
+    renderer.setScissorTest(false);
+    renderer.setViewport(0,0,W,H);
+ 
   } else {
     camera.aspect=W/H;
     camera.updateProjectionMatrix();
