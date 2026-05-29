@@ -382,7 +382,7 @@ var camera=new THREE.PerspectiveCamera(80,W/H,0.1,600);
 camera.position.set(0,2,0);
  
 // Stereo eye cameras (children of main camera)
-var EYE_SEP=0.032;
+var EYE_SEP=0.015;
 var camL=new THREE.PerspectiveCamera(80,0.5,0.1,600);
 var camR=new THREE.PerspectiveCamera(80,0.5,0.1,600);
 camL.position.set(-EYE_SEP,0,0);
@@ -548,23 +548,25 @@ function setVR(on){
  
 function resizeCams(){
   if(vrMode){
-    // Render standard side-by-side stereoscopic 3D
-    var HW=Math.floor(W/2);
+    // Determine center and shift amount (e.g., 6% of the screen width)
+    var HW = Math.floor(W/2);
+    var shift = Math.floor(W * 0.06); // Tweak this number if you still see double
+    var eyeW = HW - shift; 
+    
     renderer.setScissorTest(true);
  
-    // Left Eye
-    renderer.setScissor(0,0,HW,H);
-    renderer.setViewport(0,0,HW,H);
+    // Left Eye: Pad the far left side, shifting the image right (towards center)
+    renderer.setScissor(shift, 0, eyeW, H);
+    renderer.setViewport(shift, 0, eyeW, H);
     renderer.render(scene,camL);
  
-    // Right Eye
-    renderer.setScissor(HW,0,W-HW,H);
-    renderer.setViewport(HW,0,W-HW,H);
+    // Right Eye: Pad the far right side, shifting the image left (towards center)
+    renderer.setScissor(HW, 0, eyeW, H);
+    renderer.setViewport(HW, 0, eyeW, H);
     renderer.render(scene,camR);
  
     renderer.setScissorTest(false);
     renderer.setViewport(0,0,W,H);
- 
   } else {
     camera.aspect=W/H;
     camera.updateProjectionMatrix();
