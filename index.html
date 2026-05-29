@@ -593,8 +593,9 @@ hudTex.minFilter=THREE.LinearFilter;
 hudTex.magFilter=THREE.LinearFilter;
  
 var hudMat=new THREE.MeshBasicMaterial({map:hudTex,transparent:true,depthTest:false,depthWrite:false});
-var hudPlane=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.9),hudMat);
-hudPlane.position.set(0,-0.28,-1.0);
+var hudPlane=new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.5),hudMat);
+hudPlane.position.set(0, 0.35, -1.0);
+
 hudPlane.renderOrder=999;
 camera.add(hudPlane);
  
