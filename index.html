@@ -347,16 +347,18 @@ var BLE=(function(){
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
   var PITCH_MAX=10.0, ROLL_MAX=10.0;
-  var HOLD_DEG=2.5, SEND_MS=80, RETRY_MS=50;
+  var HOLD_DEG=2.5, SEND_MS=300, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
  
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
  
-  function setTarget(pitchRad,rollRad){
-    tP=clamp(THREE.MathUtils.radToDeg(pitchRad),PITCH_MAX);
-    tR=clamp(THREE.MathUtils.radToDeg(rollRad),ROLL_MAX);
-    hudDirty=true;
-  }
+var MOTION_AMP = 3.5; // tweak this — try 2.0 to 5.0
+
+function setTarget(pitchRad, rollRad){
+  tP = clamp(THREE.MathUtils.radToDeg(pitchRad) * MOTION_AMP, PITCH_MAX);
+  tR = clamp(THREE.MathUtils.radToDeg(rollRad)  * MOTION_AMP, ROLL_MAX);
+  hudDirty = true;
+}
  
   BLE.onRxLine(function(line){
     console.log('[SIM rx]',line,'charCode0=',line.charCodeAt(0));
@@ -874,6 +876,8 @@ function rideStep(){
   rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
   var i=Math.floor(rideState.idx);
   var tp=track[i],cp=curve[i];
+  var lateralAcc = track[ai].x - tp.x;
+  rideState.roll = Math.atan2(lateralAcc, 0.3) * 0.6;  
  
   if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
  
@@ -883,7 +887,7 @@ function rideStep(){
   rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
   rideState.roll = 0;
  
-  SIM.setTarget(rideState.pitch, 0);
+    SIM.setTarget(rideState.pitch, rideState.roll);
  
   if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
     var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; // slight fog adjustment for fluid
