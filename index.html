@@ -347,25 +347,19 @@ var BLE=(function(){
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
   var PITCH_MAX=10.0, ROLL_MAX=10.0;
-  var HOLD_DEG=2.5, SEND_MS=150, RETRY_MS=50;
-  var MOTION_AMP=3.0;
-  var SMOOTH=0.06;
-
+  var HOLD_DEG=2.5, SEND_MS=300, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
-  var smoothP=0, smoothR=0;  // ← scoped inside SIM
-
+ 
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
+ 
+var MOTION_AMP = 3.5; // tweak this — try 2.0 to 5.0
 
-  function setTarget(pitchRad,rollRad){
-    var rawP=clamp(THREE.MathUtils.radToDeg(pitchRad)*MOTION_AMP,PITCH_MAX);
-    var rawR=clamp(THREE.MathUtils.radToDeg(rollRad)*MOTION_AMP,ROLL_MAX);
-    smoothP+=(rawP-smoothP)*SMOOTH;
-    smoothR+=(rawR-smoothR)*SMOOTH;
-    tP=smoothP;
-    tR=smoothR;
-    hudDirty=true;
-  }
-
+function setTarget(pitchRad, rollRad){
+  tP = clamp(THREE.MathUtils.radToDeg(pitchRad) * MOTION_AMP, PITCH_MAX);
+  tR = clamp(THREE.MathUtils.radToDeg(rollRad)  * MOTION_AMP, ROLL_MAX);
+  hudDirty = true;
+}
+ 
   BLE.onRxLine(function(line){
     console.log('[SIM rx]',line,'charCode0=',line.charCodeAt(0));
     var ch=line.charAt(0);
@@ -381,12 +375,12 @@ var SIM=(function(){
     hudDirty=true;
     console.log('[SIM] actual pitch='+aP+' roll='+aR+' lagging='+lagging);
   });
-
+ 
   function sendPkt(){if(!BLE.isConnected())return;BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');}
   function startSending(){if(timer)clearInterval(timer);timer=setInterval(sendPkt,SEND_MS);}
   function stopSending(){
     if(timer){clearInterval(timer);timer=null;}
-    tP=0;tR=0;smoothP=0;smoothR=0;
+    tP=0;tR=0;
     if(BLE.isConnected())BLE.send('T0.0,0.0\n');
     hudDirty=true;
   }
@@ -394,13 +388,12 @@ var SIM=(function(){
   function getRetryMs(){return RETRY_MS;}
   function getState(){return{tP:tP,tR:tR,aP:aP,aR:aR,lagging:lagging,
     connected:BLE.isConnected(),PITCH_MAX:PITCH_MAX,ROLL_MAX:ROLL_MAX,HOLD_DEG:HOLD_DEG};}
-
+ 
   BLE.onConnect(function(){hudDirty=true;startSending();});
   BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();hudDirty=true;});
-
+ 
   return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState};
 })();
-
  
 // ═══════════════════════════════════════════════════════════════════════════
 //  THREE.JS SETUP
