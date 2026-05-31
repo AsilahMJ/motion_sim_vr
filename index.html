@@ -993,10 +993,8 @@ function rideStep(){
     var tp=track[i],cp=curve[i];
     
     // 2. If we are at the end of the Reynolds line, gracefully smooth out to 0,0
-    if (i >= track.length - 1) {
-      SIM.setTarget(0, 0); 
-    } else {
-      // Otherwise, do the normal steering math
+  // 2. Update pitch and roll if we haven't reached the end of the track
+    if (i < track.length - 1) {
       var ai=Math.min(i+10,track.length-1),ta=track[ai];
       var lateralAcc = ta.x - tp.x;
       var rollMultiplier = (currentRide === 'reynolds') ? 0.9 : 0.6;
@@ -1007,10 +1005,13 @@ function rideStep(){
       var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
       rideState.yaw  =Math.atan2(dx,-dz);
       rideState.pitch=-Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
-     
-      SIM.setTarget(rideState.pitch, rideState.roll);
     }
-   
+
+    // Continuously set the target. 
+    // If we hit the end of the track, this simply locks in the LAST calculated pitch & roll
+    // holding the angle until the user clicks "Exit Ride".
+    SIM.setTarget(rideState.pitch, rideState.roll);
+    
     var bgColor = (currentRide === 'reynolds') ? 0x0a1e3f : 0x08090b; 
     if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
       var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; 
