@@ -878,7 +878,9 @@ function triggerFracture(){
   flash.style.opacity='1';
   setTimeout(function(){flash.style.transition='opacity 1.2s';flash.style.opacity='0';},80);
   setTimeout(function(){flash.style.transition='';},1400);
-  if(BLE.isConnected())BLE.send('T0.0,0.0\n');
+  
+  // REMOVED: if(BLE.isConnected())BLE.send('T0.0,0.0\n'); <-- This was causing the auto-home!
+
   for(var i=0;i<40;i++){
     var s=(0.5+Math.random())*[0.8,1.2,0.5,1.8,0.6,2.0,0.9,0.4,1.5,1.1][i%10];
     var mesh=new THREE.Mesh(new THREE.BoxGeometry(s,s*0.4,s*0.7),alMat(0.15+Math.random()*0.3,0.85,0xa0b8c8));
@@ -976,7 +978,6 @@ function rideStep(){
     var ai=Math.min(i+10,track.length-1),ta=track[ai];
     
     var lateralAcc = ta.x - tp.x;
-    // Boost the roll specifically for the Reynolds ride so you feel the faster turns
     var rollMultiplier = (currentRide === 'reynolds') ? 0.9 : 0.6;
     rideState.roll = Math.atan2(lateralAcc, 0.3) * rollMultiplier;  
    
@@ -988,7 +989,7 @@ function rideStep(){
    
     SIM.setTarget(rideState.pitch, rideState.roll);
    
-   var bgColor = (currentRide === 'reynolds') ? 0x0a1e3f : 0x08090b; // deep blue or black
+    var bgColor = (currentRide === 'reynolds') ? 0x0a1e3f : 0x08090b; 
     if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
       var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; 
       var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004))) * factor;
@@ -999,14 +1000,13 @@ function rideStep(){
       scene.fog=new THREE.Fog(bgColor,80,200);
     }
    
+    // Check for Aluminum Fracture
     if(cp.region==='n'&&!fractureTriggered){
       var nf=(cp.strain-0.105)/(0.12-0.105);
       if(nf>0.6){
         fractureTriggered=true;triggerFracture();rideState.speed=0.15;
-        setTimeout(function(){
-          if(rideState)rideState.running=false;
-          exitRide(); // Automatically return to menu after crash
-        },3000);
+        // This just stops the camera from moving forward, NO auto-exit!
+        setTimeout(function(){if(rideState)rideState.running=false;},3000); 
       }
     }
    
@@ -1018,14 +1018,13 @@ function rideStep(){
    
     document.getElementById('pgb').style.width=((rideState.idx/(track.length-1))*100).toFixed(1)+'%';
    
-   // CHECK FOR END OF RIDE
+    // Loop control
     if(i<track.length-1&&rideState.running){
       requestAnimationFrame(rideStep);
     } else if (rideState.running && i >= track.length - 1) {
-      // End of the line reached gracefully
-      rideState.running = false;
-      SIM.setTarget(0, 0); // Force the chair to home to 0,0
-      // We removed the auto-exit here. You stay in the scene until you click "exit ride".
+      // End of Reynolds track reached gracefully.
+      rideState.running = false; // Stop moving
+      // DO NOTHING ELSE. The chair stays exactly where it is.
     }
   }catch(e){
     console.error('[rideStep]',e);
