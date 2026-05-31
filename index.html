@@ -124,7 +124,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
     <div style="margin-bottom:4px">
       <div class="logo-mark">// Motion of the Ocean</div>
       <div class="logo-title">Motion<br><span>Simulator</span></div>
-      <div class="logo-sub">Experience Mechanical Engineering</div>
+      <div class="logo-sub">Experience Mechanical Engineering!</div>
     </div>
     <div class="card">
       <div class="card-label">Motion Chair · Bluetooth</div>
@@ -414,30 +414,12 @@ function stopSending(){
     smoothR = tR;
     hudDirty = true;
   }
-// Add this inside the SIM block
-  function jolt() {
-    // Send an immediate, violent jump to simulate a structural snap
-    var joltP = -10.0; // Pitch violently forward (falling)
-    var joltR = 8.0;   // Roll sharply to the side
-    
-    // Override the smoothing variables instantly
-    tP = joltP; 
-    tR = joltR;
-    smoothP = joltP; 
-    smoothR = joltR;
-    
-    // Blast it straight to the hardware bypassing the queue
-    if(BLE.isConnected()) {
-      BLE.send('T' + joltP.toFixed(1) + ',' + joltR.toFixed(1) + '\n');
-    }
-    hudDirty = true;
-  }
 
   BLE.onConnect(function(){hudDirty=true;startSending();});
   BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();hudDirty=true;}); // (Assuming you applied the previous fix here!)
  
   // Update the return to include freeze
-  return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState,freeze,jolt};
+  return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState,freeze};
 })();
  
 // ═══════════════════════════════════════════════════════════════════════════
