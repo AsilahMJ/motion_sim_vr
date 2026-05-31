@@ -637,7 +637,61 @@ function drawGraph2D(ctx,gx,gy,gw,gh,pts,idx){
 var rideState=null,trackObjects=[],worldObjects=[],debrisList=[],fractured=false;
 var stretchTarget=1.0,worldGroup;
  
+// ── Water World specific generation ──
+function buildLiquidWorld() {
+  worldObjects.forEach(function(o){scene.remove(o);}); worldObjects=[];
+  debrisList=[]; fractured=false;
+  worldGroup=new THREE.Group(); scene.add(worldGroup); worldObjects.push(worldGroup);
+
+  // Deep water background & fog
+  renderer.setClearColor(0x0a1e3f);
+  scene.fog = new THREE.Fog(0x0a1e3f, 60, 250);
+
+  // Create a massive tunnel/pipe
+  var pipeGeo = new THREE.CylinderGeometry(15, 15, 550, 32, 1, true);
+  var pipeMat = new THREE.MeshStandardMaterial({
+    color: 0x0a2a50, roughness: 0.4, metalness: 0.1, side: THREE.BackSide
+  });
+  var pipe = new THREE.Mesh(pipeGeo, pipeMat);
+  pipe.rotation.x = Math.PI / 2;
+  pipe.position.z = -250;
+  worldGroup.add(pipe);
+
+  // Add floating "bubbles" to visualize the fluid
+  var bubbleGeo = new THREE.SphereGeometry(0.15, 8, 8);
+  var bubbleMat = new THREE.MeshStandardMaterial({
+    color: 0x88ccff, transparent: true, opacity: 0.6, roughness: 0.1
+  });
+  for(var i=0; i<400; i++) {
+    var bubble = new THREE.Mesh(bubbleGeo, bubbleMat);
+    bubble.position.set(
+      (Math.random() - 0.5) * 26,
+      (Math.random() - 0.5) * 26,
+      -Math.random() * 550
+    );
+    worldGroup.add(bubble);
+  }
+
+  // Add glowing rings to show speed and depth
+  for(var z=0; z>=-550; z-=30) {
+    var ringGeo = new THREE.TorusGeometry(14.8, 0.15, 8, 32);
+    var ringMat = new THREE.MeshBasicMaterial({color: 0x114488});
+    var ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.z = z;
+    worldGroup.add(ring);
+  }
+}
+
 function buildWorld(){
+  if (currentRide === 'reynolds') {
+    buildLiquidWorld();
+    return;
+  }
+
+  // ── Existing Aluminum Metal World ──
+  renderer.setClearColor(0x08090b);
+  scene.fog=new THREE.Fog(0x08090b,80,200);
+
   worldObjects.forEach(function(o){scene.remove(o);}); worldObjects=[];
   debrisList=[]; fractured=false;
   worldGroup=new THREE.Group(); scene.add(worldGroup); worldObjects.push(worldGroup);
@@ -668,6 +722,53 @@ function buildWorld(){
     (function(){var _m=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.1,4),lm);_m.position.set(0,10.5,sl);worldGroup.add(_m);})();
   }
   (function(){var _m=new THREE.Mesh(new THREE.PlaneGeometry(40,14),alMat(0.4,0.8,0x8899aa));_m.position.set(0,5,-248);worldGroup.add(_m);})();
+}
+
+function buildTrack(track){
+  trackObjects.forEach(function(o){scene.remove(o);}); trackObjects=[];
+  
+  if (currentRide === 'reynolds') {
+    // Liquid stream line
+    var positions=[],colors=[];
+    for(var i=0;i<track.length;i++){
+      var p=track[i];
+      positions.push(p.x,p.y,p.z);
+      var c=CMAP3[p.region]||CMAP3['laminar'];
+      colors.push(c.r,c.g,c.b);
+    }
+    var geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+    geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+    // Draw a single bright flow line
+    var line=new THREE.Line(geo,new THREE.LineBasicMaterial({vertexColors:true}));
+    scene.add(line);trackObjects.push(line);
+    
+  } else {
+    // Aluminum Roller Coaster Track
+    for(var side=-1;side<=1;side+=2){
+      var positions=[],colors=[];
+      for(var i=0;i<track.length;i++){
+        var p=track[i],ref=Math.min(i,track.length-2),nx=track[ref+1];
+        var ddx=nx.x-track[ref].x,ddz=nx.z-track[ref].z,len=Math.sqrt(ddx*ddx+ddz*ddz)||1;
+        positions.push(p.x+side*(-ddz/len)*0.5,p.y,p.z+side*(ddx/len)*0.5);
+        var c=CMAP3[p.region]||CMAP3['e'];colors.push(c.r,c.g,c.b);
+      }
+      var geo=new THREE.BufferGeometry();
+      geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+      geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+      var line=new THREE.Line(geo,new THREE.LineBasicMaterial({vertexColors:true}));
+      scene.add(line);trackObjects.push(line);
+    }
+    var tMat=new THREE.MeshStandardMaterial({color:0x889aaa,metalness:0.9,roughness:0.2});
+    var tGeo=new THREE.BoxGeometry(1.2,0.07,0.15);
+    for(var i=0;i<track.length-1;i+=6){
+      var tie=new THREE.Mesh(tGeo,tMat);
+      tie.position.set(track[i].x,track[i].y-0.12,track[i].z);
+      var dir=new THREE.Vector3(track[i+1].x-track[i].x,track[i+1].y-track[i].y,track[i+1].z-track[i].z).normalize();
+      if(dir.lengthSq()>0.001)tie.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),dir);
+      scene.add(tie);trackObjects.push(tie);
+    }
+  }
 }
  
 // ── Ride 1: Aluminum Stress-Strain ──
@@ -770,33 +871,6 @@ Object.assign(CMAP3, {
   transitional: new THREE.Color(0xf5c542),
   turbulent: new THREE.Color(0xff5f6d)
 });
- 
-function buildTrack(track){
-  trackObjects.forEach(function(o){scene.remove(o);}); trackObjects=[];
-  for(var side=-1;side<=1;side+=2){
-    var positions=[],colors=[];
-    for(var i=0;i<track.length;i++){
-      var p=track[i],ref=Math.min(i,track.length-2),nx=track[ref+1];
-      var ddx=nx.x-track[ref].x,ddz=nx.z-track[ref].z,len=Math.sqrt(ddx*ddx+ddz*ddz)||1;
-      positions.push(p.x+side*(-ddz/len)*0.5,p.y,p.z+side*(ddx/len)*0.5);
-      var c=CMAP3[p.region]||CMAP3['e'];colors.push(c.r,c.g,c.b);
-    }
-    var geo=new THREE.BufferGeometry();
-    geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
-    geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
-    var line=new THREE.Line(geo,new THREE.LineBasicMaterial({vertexColors:true}));
-    scene.add(line);trackObjects.push(line);
-  }
-  var tMat=new THREE.MeshStandardMaterial({color:0x889aaa,metalness:0.9,roughness:0.2});
-  var tGeo=new THREE.BoxGeometry(1.2,0.07,0.15);
-  for(var i=0;i<track.length-1;i+=6){
-    var tie=new THREE.Mesh(tGeo,tMat);
-    tie.position.set(track[i].x,track[i].y-0.12,track[i].z);
-    var dir=new THREE.Vector3(track[i+1].x-track[i].x,track[i+1].y-track[i].y,track[i+1].z-track[i].z).normalize();
-    if(dir.lengthSq()>0.001)tie.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),dir);
-    scene.add(tie);trackObjects.push(tie);
-  }
-}
  
 function triggerFracture(){
   fractured=true;
@@ -914,14 +988,15 @@ function rideStep(){
    
     SIM.setTarget(rideState.pitch, rideState.roll);
    
+   var bgColor = (currentRide === 'reynolds') ? 0x0a1e3f : 0x08090b; // deep blue or black
     if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
       var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; 
       var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004))) * factor;
       stretchTarget=1+pf*1.8;
-      scene.fog=new THREE.Fog(0x08090b,80+pf*120,200+pf*200);
+      scene.fog=new THREE.Fog(bgColor,80+pf*120,200+pf*200);
     } else {
       stretchTarget=1;
-      scene.fog=new THREE.Fog(0x08090b,80,200);
+      scene.fog=new THREE.Fog(bgColor,80,200);
     }
    
     if(cp.region==='n'&&!fractureTriggered){
@@ -943,17 +1018,14 @@ function rideStep(){
    
     document.getElementById('pgb').style.width=((rideState.idx/(track.length-1))*100).toFixed(1)+'%';
    
-    // CHECK FOR END OF RIDE
+   // CHECK FOR END OF RIDE
     if(i<track.length-1&&rideState.running){
       requestAnimationFrame(rideStep);
     } else if (rideState.running && i >= track.length - 1) {
-      // End of the line reached gracefully (Reynolds)
+      // End of the line reached gracefully
       rideState.running = false;
       SIM.setTarget(0, 0); // Force the chair to home to 0,0
-      
-      setTimeout(function() {
-        exitRide(); // Automatically exit back to the menu after 2 seconds
-      }, 2000);
+      // We removed the auto-exit here. You stay in the scene until you click "exit ride".
     }
   }catch(e){
     console.error('[rideStep]',e);
