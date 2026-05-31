@@ -337,15 +337,15 @@ var BLE=(function(){
 //  MOTION SIM CONTROLLER
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
-  var PITCH_MAX=10.0, ROLL_MAX=10.0;
+  var PITCH_MAX=22.0, ROLL_MAX=22.0;
   var HOLD_DEG=2.5, SEND_MS=80, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
  
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
  
-var MOTION_AMP = 6.0; // tweak this — try 2.0 to 5.0
+var MOTION_AMP = 14.0; // raised from 6.0 for more dramatic angles
 var smoothP = 0, smoothR = 0;
-var SMOOTH = 0.08; // lower = smoother/slower, try 0.05–0.15
+var SMOOTH = 0.20; // raised from 0.08 for snappier, more immediate response
 
 function setTarget(pitchRad, rollRad){
   var rawP = clamp(THREE.MathUtils.radToDeg(pitchRad) * MOTION_AMP, PITCH_MAX);
@@ -874,8 +874,8 @@ function toReynoldsTrack(pts){
     phase += (Math.PI * 4 * freqMult) * dt;
 
     // Use lower frequency for flowNoise to reduce jitter
-    var x = Math.sin(phase) * (2 + noiseAmp) + flowNoise(t * 6) * noiseAmp;
-    var y = Math.cos(phase) * (1 + noiseAmp) + flowNoise(t * 8) * noiseAmp;
+    var x = Math.sin(phase) * (5 + noiseAmp * 2) + flowNoise(t * 6) * noiseAmp;
+    var y = Math.cos(phase) * (3 + noiseAmp * 2) + flowNoise(t * 8) * noiseAmp;
 
     return{
       x: x, y: y, z: z, bank: 0,
@@ -994,7 +994,10 @@ function rideStep(){
     
     // 1. Only advance the camera forward if we haven't reached the end yet
     if (rideState.idx < track.length - 1) {
-      rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
+      // Speed up through turbulent region
+      var cp_region = curve[Math.floor(rideState.idx)].region;
+      var speedMult = (cp_region === 'turbulent') ? 2.8 : (cp_region === 'transitional') ? 1.6 : 1.0;
+      rideState.idx=Math.min(rideState.idx+rideState.speed*speedMult,track.length-1);
     }
     
     var i=Math.floor(rideState.idx);
@@ -1011,8 +1014,8 @@ function rideStep(){
     if (i < track.length - 1 && !fractured) {
       var ai=Math.min(i+10,track.length-1),ta=track[ai];
       var lateralAcc = ta.x - tp.x;
-      var rollMultiplier = (currentRide === 'reynolds') ? 0.9 : 0.6;
-      rideState.roll = Math.atan2(lateralAcc, 0.3) * rollMultiplier;  
+      var rollMultiplier = (currentRide === 'reynolds') ? 2.5 : 0.8;
+      rideState.roll = Math.atan2(lateralAcc, 0.15) * rollMultiplier;  
      
       camera.position.set(tp.x,tp.y+1.6,tp.z);
      
