@@ -385,10 +385,22 @@ function setTarget(pitchRad, rollRad){
  
   function sendPkt(){if(!BLE.isConnected())return;BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');}
   function startSending(){if(timer)clearInterval(timer);timer=setInterval(sendPkt,SEND_MS);}
-  function stopSending(){
+ function stopSending(){
     if(timer){clearInterval(timer);timer=null;}
-    tP=0;tR=0;
-    if(BLE.isConnected())BLE.send('T0.0,0.0\n');
+    
+    // 1. Reset targets and smoothing variables so the next ride starts perfectly level
+    tP=0; tR=0;
+    smoothP = 0; 
+    smoothR = 0;
+    
+    // 2. Guarantee the chair homes by sending the command multiple times
+    if(BLE.isConnected()) {
+      BLE.send('T0.0,0.0\n');
+      setTimeout(function(){ if(BLE.isConnected()) BLE.send('T0.0,0.0\n'); }, 150);
+      setTimeout(function(){ if(BLE.isConnected()) BLE.send('T0.0,0.0\n'); }, 300);
+      setTimeout(function(){ if(BLE.isConnected()) BLE.send('T0.0,0.0\n'); }, 450);
+    }
+    
     hudDirty=true;
   }
   function isLagging(){return BLE.isConnected()&&lagging;}
@@ -971,23 +983,33 @@ function rideStep(){
     if(SIM.isLagging()){setTimeout(rideStep,SIM.getRetryMs());return;}
    
     var track=rideState.track,curve=rideState.curve;
-    rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
+    
+    // 1. Only advance the camera forward if we haven't reached the end yet
+    if (rideState.idx < track.length - 1) {
+      rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
+    }
+    
     var i=Math.floor(rideState.idx);
     var tp=track[i],cp=curve[i];
     
-    var ai=Math.min(i+10,track.length-1),ta=track[ai];
-    
-    var lateralAcc = ta.x - tp.x;
-    var rollMultiplier = (currentRide === 'reynolds') ? 0.9 : 0.6;
-    rideState.roll = Math.atan2(lateralAcc, 0.3) * rollMultiplier;  
-   
-    if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
-   
-    var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
-    rideState.yaw  =Math.atan2(dx,-dz);
-    rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
-   
-    SIM.setTarget(rideState.pitch, rideState.roll);
+    // 2. If we are at the end of the Reynolds line, gracefully smooth out to 0,0
+    if (i >= track.length - 1) {
+      SIM.setTarget(0, 0); 
+    } else {
+      // Otherwise, do the normal steering math
+      var ai=Math.min(i+10,track.length-1),ta=track[ai];
+      var lateralAcc = ta.x - tp.x;
+      var rollMultiplier = (currentRide === 'reynolds') ? 0.9 : 0.6;
+      rideState.roll = Math.atan2(lateralAcc, 0.3) * rollMultiplier;  
+     
+      if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
+     
+      var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
+      rideState.yaw  =Math.atan2(dx,-dz);
+      rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
+     
+      SIM.setTarget(rideState.pitch, rideState.roll);
+    }
    
     var bgColor = (currentRide === 'reynolds') ? 0x0a1e3f : 0x08090b; 
     if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
@@ -1005,7 +1027,7 @@ function rideStep(){
       var nf=(cp.strain-0.105)/(0.12-0.105);
       if(nf>0.6){
         fractureTriggered=true;triggerFracture();rideState.speed=0.15;
-        // This just stops the camera from moving forward, NO auto-exit!
+        // Stops the aluminum ride dead in its tracks at the crash angle
         setTimeout(function(){if(rideState)rideState.running=false;},3000); 
       }
     }
@@ -1018,13 +1040,9 @@ function rideStep(){
    
     document.getElementById('pgb').style.width=((rideState.idx/(track.length-1))*100).toFixed(1)+'%';
    
-    // Loop control
-    if(i<track.length-1&&rideState.running){
+    // 3. Keep the animation loop alive so the chair's smoothing logic can finish!
+    if(rideState.running){
       requestAnimationFrame(rideStep);
-    } else if (rideState.running && i >= track.length - 1) {
-      // End of Reynolds track reached gracefully.
-      rideState.running = false; // Stop moving
-      // DO NOTHING ELSE. The chair stays exactly where it is.
     }
   }catch(e){
     console.error('[rideStep]',e);
