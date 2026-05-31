@@ -347,7 +347,7 @@ var BLE=(function(){
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
   var PITCH_MAX=10.0, ROLL_MAX=10.0;
-  var HOLD_DEG=2.5, SEND_MS=150, RETRY_MS=50;
+  var HOLD_DEG=2.5, SEND_MS=80, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
  
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
