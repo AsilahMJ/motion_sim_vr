@@ -124,7 +124,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
     <div style="margin-bottom:4px">
       <div class="logo-mark">// Motion of the Ocean</div>
       <div class="logo-title">Motion<br><span>Simulator</span></div>
-      <div class="logo-sub">Experience Mechanical Engineering!</div>
+      <div class="logo-sub">Experience Mechanical Engineering</div>
     </div>
     <div class="card">
       <div class="card-label">Motion Chair · Bluetooth</div>
@@ -376,24 +376,31 @@ function setTarget(pitchRad, rollRad){
  
   function sendPkt(){if(!BLE.isConnected())return;BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');}
   function startSending(){if(timer)clearInterval(timer);timer=setInterval(sendPkt,SEND_MS);}
- function stopSending(){
-    if(timer){clearInterval(timer);timer=null;}
-    
-    // 1. Reset targets and smoothing variables so the next ride starts perfectly level
+function stopSending(){
+    // 1. Do NOT clear the timer here! We want the interval to keep broadcasting 
+    // the 0,0 target every 80ms to guarantee the chair returns to level.
+
+    // 2. Reset targets and smoothing variables to 0
     tP=0; tR=0;
     smoothP = 0; 
     smoothR = 0;
     
-    // 2. Guarantee the chair homes by sending the command multiple times
+    // 3. Send one immediate homing packet
     if(BLE.isConnected()) {
       BLE.send('T0.0,0.0\n');
-      setTimeout(function(){ if(BLE.isConnected()) BLE.send('T0.0,0.0\n'); }, 150);
-      setTimeout(function(){ if(BLE.isConnected()) BLE.send('T0.0,0.0\n'); }, 300);
-      setTimeout(function(){ if(BLE.isConnected()) BLE.send('T0.0,0.0\n'); }, 450);
     }
     
     hudDirty=true;
   }
+
+  // Update onDisconnect to actually clear the timer so it doesn't run indefinitely offline
+  BLE.onDisconnect(function(){
+    lagging=false; aP=null; aR=null;
+    if(timer){clearInterval(timer);timer=null;}
+    tP=0; tR=0; smoothP=0; smoothR=0;
+    hudDirty=true;
+  });
+  
   function isLagging(){return BLE.isConnected()&&lagging;}
   function getRetryMs(){return RETRY_MS;}
   function getState(){return{tP:tP,tR:tR,aP:aP,aR:aR,lagging:lagging,
@@ -983,15 +990,15 @@ function rideStep(){
     var i=Math.floor(rideState.idx);
     var tp=track[i],cp=curve[i];
     
-    // 2. If we are at the end of the Reynolds line, gracefully smooth out to 0,0
-  // 2. Update pitch and roll if we haven't reached the end of the track
-    if (i < track.length - 1) {
+  // 2. Update pitch and roll ONLY if we haven't reached the end AND haven't fractured
+    if (i < track.length - 1 && !fractured) {
       var ai=Math.min(i+10,track.length-1),ta=track[ai];
       var lateralAcc = ta.x - tp.x;
       var rollMultiplier = (currentRide === 'reynolds') ? 0.9 : 0.6;
       rideState.roll = Math.atan2(lateralAcc, 0.3) * rollMultiplier;  
      
-      if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
+      // Because this block only runs if !fractured, we can simplify this line
+      camera.position.set(tp.x,tp.y+1.6,tp.z);
      
       var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
       rideState.yaw  =Math.atan2(dx,-dz);
