@@ -124,7 +124,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
     <div style="margin-bottom:4px">
       <div class="logo-mark">// Motion of the Ocean</div>
       <div class="logo-title">Motion<br><span>Simulator</span></div>
-      <div class="logo-sub">Experience Mechanical Engineering</div>
+      <div class="logo-sub">Experience Mechanical Engineering!</div>
     </div>
     <div class="card">
       <div class="card-label">Motion Chair · Bluetooth</div>
@@ -406,10 +406,38 @@ function stopSending(){
   function getState(){return{tP:tP,tR:tR,aP:aP,aR:aR,lagging:lagging,
     connected:BLE.isConnected(),PITCH_MAX:PITCH_MAX,ROLL_MAX:ROLL_MAX,HOLD_DEG:HOLD_DEG};}
  
+// Add this freeze function right above the BLE.onConnect line
+  function freeze(){
+    if(aP !== null && aR !== null){
+      tP = aP; tR = aR;
+      smoothP = aP; smoothR = aR;
+      hudDirty = true;
+    }
+  }
+// Add this inside the SIM block
+  function jolt() {
+    // Send an immediate, violent jump to simulate a structural snap
+    var joltP = -10.0; // Pitch violently forward (falling)
+    var joltR = 8.0;   // Roll sharply to the side
+    
+    // Override the smoothing variables instantly
+    tP = joltP; 
+    tR = joltR;
+    smoothP = joltP; 
+    smoothR = joltR;
+    
+    // Blast it straight to the hardware bypassing the queue
+    if(BLE.isConnected()) {
+      BLE.send('T' + joltP.toFixed(1) + ',' + joltR.toFixed(1) + '\n');
+    }
+    hudDirty = true;
+  }
+
   BLE.onConnect(function(){hudDirty=true;startSending();});
-  BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();hudDirty=true;});
+  BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();hudDirty=true;}); // (Assuming you applied the previous fix here!)
  
-  return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState};
+  // Update the return to include freeze
+  return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState,freeze,jolt};
 })();
  
 // ═══════════════════════════════════════════════════════════════════════════
@@ -989,26 +1017,28 @@ function rideStep(){
     
     var i=Math.floor(rideState.idx);
     var tp=track[i],cp=curve[i];
+
+    // 2. Detect the end of the Reynolds Ride and instantly freeze everything
+    if (currentRide === 'reynolds' && i >= track.length - 1) {
+      rideState.running = false; 
+      SIM.freeze(); 
+    }
     
-  // 2. Update pitch and roll ONLY if we haven't reached the end AND haven't fractured
+    // 3. Update pitch and roll ONLY if we are actively moving and haven't crashed
     if (i < track.length - 1 && !fractured) {
       var ai=Math.min(i+10,track.length-1),ta=track[ai];
       var lateralAcc = ta.x - tp.x;
       var rollMultiplier = (currentRide === 'reynolds') ? 0.9 : 0.6;
       rideState.roll = Math.atan2(lateralAcc, 0.3) * rollMultiplier;  
      
-      // Because this block only runs if !fractured, we can simplify this line
       camera.position.set(tp.x,tp.y+1.6,tp.z);
      
       var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
       rideState.yaw  =Math.atan2(dx,-dz);
       rideState.pitch=-Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
-    }
 
-    // Continuously set the target. 
-    // If we hit the end of the track, this simply locks in the LAST calculated pitch & roll
-    // holding the angle until the user clicks "Exit Ride".
-    SIM.setTarget(rideState.pitch, rideState.roll);
+      SIM.setTarget(rideState.pitch, rideState.roll);
+    }
     
     var bgColor = (currentRide === 'reynolds') ? 0x0a1e3f : 0x08090b; 
     if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
@@ -1022,12 +1052,20 @@ function rideStep(){
     }
    
     // Check for Aluminum Fracture
+   // Check for Aluminum Fracture
     if(cp.region==='n'&&!fractureTriggered){
       var nf=(cp.strain-0.105)/(0.12-0.105);
       if(nf>0.6){
         fractureTriggered=true;triggerFracture();rideState.speed=0.15;
-        // Stops the aluminum ride dead in its tracks at the crash angle
-        setTimeout(function(){if(rideState)rideState.running=false;},3000); 
+        
+        // ADD THE JOLT HERE:
+        SIM.jolt(); 
+
+        // Stops the aluminum ride loop at the crash angle
+        setTimeout(function(){
+            if(rideState)rideState.running=false; 
+            SIM.freeze(); // (If you added this from the last step!)
+        }, 3000); 
       }
     }
    
