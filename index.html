@@ -352,7 +352,7 @@ var SIM=(function(){
  
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
  
-var MOTION_AMP = 3.5; // tweak this — try 2.0 to 5.0
+var MOTION_AMP = 5.0; // tweak this — try 2.0 to 5.0
 
 function setTarget(pitchRad, rollRad){
   tP = clamp(THREE.MathUtils.radToDeg(pitchRad) * MOTION_AMP, PITCH_MAX);
