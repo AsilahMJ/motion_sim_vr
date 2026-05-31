@@ -869,51 +869,62 @@ var fractureTriggered=false;
  
 function rideStep(){
   try{
-  if(!rideState||!rideState.running)return;
-  if(SIM.isLagging()){setTimeout(rideStep,SIM.getRetryMs());return;}
- 
-  var track=rideState.track,curve=rideState.curve;
-  rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
-  var i=Math.floor(rideState.idx);
-  var tp=track[i],cp=curve[i];
-  var lateralAcc = track[ai].x - tp.x;
-  rideState.roll = Math.atan2(lateralAcc, 0.3) * 0.6;  
- 
-  if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
- 
-  var ai=Math.min(i+10,track.length-1),ta=track[ai];
-  var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
-  rideState.yaw  =Math.atan2(dx,-dz);
-  rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
-  rideState.roll = 0;
- 
+    if(!rideState||!rideState.running)return;
+    if(SIM.isLagging()){setTimeout(rideStep,SIM.getRetryMs());return;}
+   
+    var track=rideState.track,curve=rideState.curve;
+    rideState.idx=Math.min(rideState.idx+rideState.speed,track.length-1);
+    var i=Math.floor(rideState.idx);
+    var tp=track[i],cp=curve[i];
+    
+    // ✅ Define 'ai' and 'ta' BEFORE using them
+    var ai=Math.min(i+10,track.length-1),ta=track[ai];
+    
+    // Now you can safely use track[ai] (or ta)
+    var lateralAcc = ta.x - tp.x;
+    rideState.roll = Math.atan2(lateralAcc, 0.3) * 0.6;  
+   
+    if(!fractured)camera.position.set(tp.x,tp.y+1.6,tp.z);
+   
+    var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
+    rideState.yaw  =Math.atan2(dx,-dz);
+    rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
+    // rideState.roll = 0; // Ensure this doesn't overwrite your roll calculation above!
+   
     SIM.setTarget(rideState.pitch, rideState.roll);
- 
-  if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
-    var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; // slight fog adjustment for fluid
-    var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004))) * factor;
-    stretchTarget=1+pf*1.8;
-    scene.fog=new THREE.Fog(0x08090b,80+pf*120,200+pf*200);
-  } else {stretchTarget=1;scene.fog=new THREE.Fog(0x08090b,80,200);}
- 
-  if(cp.region==='n'&&!fractureTriggered){
-    var nf=(cp.strain-0.105)/(0.12-0.105);
-    if(nf>0.6){
-      fractureTriggered=true;triggerFracture();rideState.speed=0.15;
-      setTimeout(function(){if(rideState)rideState.running=false;},3000);
+   
+    if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
+      var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; 
+      var pf=Math.max(0,Math.min(1,(cp.strain-0.004)/(0.12-0.004))) * factor;
+      stretchTarget=1+pf*1.8;
+      scene.fog=new THREE.Fog(0x08090b,80+pf*120,200+pf*200);
+    } else {
+      stretchTarget=1;
+      scene.fog=new THREE.Fog(0x08090b,80,200);
     }
+   
+    if(cp.region==='n'&&!fractureTriggered){
+      var nf=(cp.strain-0.105)/(0.12-0.105);
+      if(nf>0.6){
+        fractureTriggered=true;triggerFracture();rideState.speed=0.15;
+        setTimeout(function(){if(rideState)rideState.running=false;},3000);
+      }
+    }
+   
+    hudState.region=cp.region;
+    hudState.stress=cp.stress;
+    hudState.strain=cp.strain;
+    hudState.curveIdx=i;
+    hudDirty=true;
+   
+    document.getElementById('pgb').style.width=((rideState.idx/(track.length-1))*100).toFixed(1)+'%';
+   
+    if(i<track.length-1&&rideState.running){
+      requestAnimationFrame(rideStep);
+    }
+  }catch(e){
+    console.error('[rideStep]',e);
   }
- 
-  hudState.region=cp.region;
-  hudState.stress=cp.stress;
-  hudState.strain=cp.strain;
-  hudState.curveIdx=i;
-  hudDirty=true;
- 
-  document.getElementById('pgb').style.width=((rideState.idx/(track.length-1))*100).toFixed(1)+'%';
- 
-  if(i<track.length-1&&rideState.running)requestAnimationFrame(rideStep);
-  }catch(e){console.error('[rideStep]',e);}
 }
  
 // ═══════════════════════════════════════════════════════════════════════════
