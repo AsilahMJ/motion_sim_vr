@@ -338,14 +338,14 @@ var BLE=(function(){
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
   var PITCH_MAX=22.0, ROLL_MAX=22.0;
-  var HOLD_DEG=2.5, SEND_MS=150, RETRY_MS=50;
+  var HOLD_DEG=2.5, SEND_MS=80, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
  
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
  
 var MOTION_AMP = 15.0; // raised from 6.0 for more dramatic angles
 var smoothP = 0, smoothR = 0;
-var SMOOTH = 0.20; // raised from 0.08 for snappier, more immediate response
+var SMOOTH = 0.40; // raised from 0.08 for snappier, more immediate response
 
 function setTarget(pitchRad, rollRad){
   var rawP = clamp(THREE.MathUtils.radToDeg(pitchRad) * MOTION_AMP, PITCH_MAX);
@@ -976,7 +976,7 @@ renderLoop();
 //  RIDE STEP
 // ═══════════════════════════════════════════════════════════════════════════
 function startRide(track,curve){
-  rideState={track,curve,idx:0,running:true,speed:0.8,yaw:0,pitch:0,roll:0};
+  rideState={track,curve,idx:0,running:true,speed:0.4,yaw:0,pitch:0,roll:0};
   stretchTarget=1.0;fractured=false;
   camera.position.set(track[0].x,track[0].y+1.6,track[0].z);
   hudState.curvePts=curve;hudState.curveIdx=0;hudDirty=true;
