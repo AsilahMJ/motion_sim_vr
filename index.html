@@ -1006,7 +1006,7 @@ function rideStep(){
      
       var dx=ta.x-tp.x,dy=ta.y-tp.y,dz=ta.z-tp.z;
       rideState.yaw  =Math.atan2(dx,-dz);
-      rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
+      rideState.pitch=-Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
      
       SIM.setTarget(rideState.pitch, rideState.roll);
     }
