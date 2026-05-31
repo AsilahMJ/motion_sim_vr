@@ -352,12 +352,11 @@ var SIM=(function(){
  
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
  
-  function setTarget(pitchRad,rollRad){
-    tP=clamp(THREE.MathUtils.radToDeg(pitchRad),PITCH_MAX);
-    tR=clamp(THREE.MathUtils.radToDeg(rollRad),ROLL_MAX);
-    hudDirty=true;
-  }
- 
+  // getTargetFn is optional: a function returning {pitch, roll} in radians.
+  // When provided, the 80ms interval samples it and converts to degrees itself,
+  // so setTarget() no longer needs to be called every animation frame.
+  var _getTargetFn=null;
+
   BLE.onRxLine(function(line){
     console.log('[SIM rx]',line,'charCode0=',line.charCodeAt(0));
     var ch=line.charAt(0);
@@ -373,11 +372,26 @@ var SIM=(function(){
     hudDirty=true;
     console.log('[SIM] actual pitch='+aP+' roll='+aR+' lagging='+lagging);
   });
- 
-  function sendPkt(){if(!BLE.isConnected())return;BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');}
-  function startSending(){if(timer)clearInterval(timer);timer=setInterval(sendPkt,SEND_MS);}
+
+  function sendPkt(){
+    if(!BLE.isConnected())return;
+    // Sample the latest ride state right before sending (strict 80ms cadence)
+    if(_getTargetFn){
+      var t=_getTargetFn();
+      tP=clamp(THREE.MathUtils.radToDeg(t.pitch),PITCH_MAX);
+      tR=clamp(THREE.MathUtils.radToDeg(t.roll),ROLL_MAX);
+      hudDirty=true;
+    }
+    BLE.send('T'+tP.toFixed(1)+','+tR.toFixed(1)+'\n');
+  }
+  function startSending(getTargetFn){
+    _getTargetFn=getTargetFn||null;
+    if(timer)clearInterval(timer);
+    timer=setInterval(sendPkt,SEND_MS);
+  }
   function stopSending(){
     if(timer){clearInterval(timer);timer=null;}
+    _getTargetFn=null;
     tP=0;tR=0;
     if(BLE.isConnected())BLE.send('T0.0,0.0\n');
     hudDirty=true;
@@ -386,11 +400,12 @@ var SIM=(function(){
   function getRetryMs(){return RETRY_MS;}
   function getState(){return{tP:tP,tR:tR,aP:aP,aR:aR,lagging:lagging,
     connected:BLE.isConnected(),PITCH_MAX:PITCH_MAX,ROLL_MAX:ROLL_MAX,HOLD_DEG:HOLD_DEG};}
- 
-  BLE.onConnect(function(){hudDirty=true;startSending();});
+
+  // On BLE connect during a ride, restart the interval (preserves existing sampler)
+  BLE.onConnect(function(){hudDirty=true;if(_getTargetFn||timer)startSending(_getTargetFn);});
   BLE.onDisconnect(function(){lagging=false;aP=null;aR=null;stopSending();hudDirty=true;});
- 
-  return{setTarget,isLagging,getRetryMs,startSending,stopSending,getState};
+
+  return{isLagging,getRetryMs,startSending,stopSending,getState};
 })();
  
 // ═══════════════════════════════════════════════════════════════════════════
@@ -860,7 +875,11 @@ function startRide(track,curve){
   stretchTarget=1.0;fractured=false;
   camera.position.set(track[0].x,track[0].y+1.6,track[0].z);
   hudState.curvePts=curve;hudState.curveIdx=0;hudDirty=true;
-  SIM.startSending();
+  // Pass a sampler so the strict 80ms interval reads pitch/roll at send-time,
+  // rather than receiving stale values written at 60fps by rideStep.
+  SIM.startSending(function(){
+    return{pitch:rideState?rideState.pitch:0,roll:rideState?rideState.roll:0};
+  });
   rideStep();
 }
 var fractureTriggered=false;
@@ -882,8 +901,6 @@ function rideStep(){
   rideState.yaw  =Math.atan2(dx,-dz);
   rideState.pitch=Math.atan2(dy,Math.sqrt(dx*dx+dz*dz)+.001);
   rideState.roll = 0;
- 
-  SIM.setTarget(rideState.pitch, 0);
  
   if(cp.region==='p'||cp.region==='n'||cp.region==='turbulent'){
     var factor = (cp.region === 'turbulent') ? 0.3 : 1.0; // slight fog adjustment for fluid
