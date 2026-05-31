@@ -347,16 +347,23 @@ var BLE=(function(){
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
   var PITCH_MAX=10.0, ROLL_MAX=10.0;
-  var HOLD_DEG=2.5, SEND_MS=300, RETRY_MS=50;
+  var HOLD_DEG=2.5, SEND_MS=150, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
  
   function clamp(v,mx){return Math.max(-mx,Math.min(mx,v));}
  
-var MOTION_AMP = 3.5; // tweak this — try 2.0 to 5.0
+var MOTION_AMP = 4.0; // tweak this — try 2.0 to 5.0
+var smoothP = 0, smoothR = 0;
+var SMOOTH = 0.08; // lower = smoother/slower, try 0.05–0.15
 
 function setTarget(pitchRad, rollRad){
-  tP = clamp(THREE.MathUtils.radToDeg(pitchRad) * MOTION_AMP, PITCH_MAX);
-  tR = clamp(THREE.MathUtils.radToDeg(rollRad)  * MOTION_AMP, ROLL_MAX);
+  var rawP = clamp(THREE.MathUtils.radToDeg(pitchRad) * MOTION_AMP, PITCH_MAX);
+  var rawR = clamp(THREE.MathUtils.radToDeg(rollRad)  * MOTION_AMP, ROLL_MAX);
+  // Lerp toward raw target
+  smoothP += (rawP - smoothP) * SMOOTH;
+  smoothR += (rawR - smoothR) * SMOOTH;
+  tP = smoothP;
+  tR = smoothR;
   hudDirty = true;
 }
  
@@ -926,7 +933,6 @@ function rideStep(){
     console.error('[rideStep]',e);
   }
 }
- 
 // ═══════════════════════════════════════════════════════════════════════════
 //  COUNTDOWN
 // ═══════════════════════════════════════════════════════════════════════════
