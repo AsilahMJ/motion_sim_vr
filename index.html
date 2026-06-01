@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <title>PhysicsVR · Motion Simulator</title>
@@ -337,7 +337,7 @@ var BLE=(function(){
 //  MOTION SIM CONTROLLER
 // ═══════════════════════════════════════════════════════════════════════════
 var SIM=(function(){
-  var PITCH_MAX=10.0, ROLL_MAX=10.0;
+  var PITCH_MAX=15.0, ROLL_MAX=15.0;
   var HOLD_DEG=2.5, SEND_MS=80, RETRY_MS=50;
   var tP=0,tR=0,aP=null,aR=null,lagging=false,timer=null;
  
@@ -874,8 +874,8 @@ function toReynoldsTrack(pts){
     phase += (Math.PI * 4 * freqMult) * dt;
 
     // Use lower frequency for flowNoise to reduce jitter
-    var x = Math.sin(phase) * (5 + noiseAmp) + flowNoise(t * 6) * noiseAmp;
-    var y = Math.cos(phase) * (4 + noiseAmp) + flowNoise(t * 8) * noiseAmp;
+    var x = Math.sin(phase) * (2 + noiseAmp) + flowNoise(t * 6) * noiseAmp;
+    var y = Math.cos(phase) * (1 + noiseAmp) + flowNoise(t * 8) * noiseAmp;
 
     return{
       x: x, y: y, z: z, bank: 0,
