@@ -122,9 +122,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Sy
 <div class="screen" id="screenMenu">
   <div class="mi">
     <div style="margin-bottom:4px">
-      <div class="logo-mark">// Motion of the Ocean</div>
+      <div class="logo-mark">Motion of the Ocean</div>
       <div class="logo-title">Motion<br><span>Simulator</span></div>
-      <div class="logo-sub">Experience Mechanical Engineering!</div>
+      <div class="logo-sub">Experience Mechanical Engineering</div>
     </div>
     <div class="card">
       <div class="card-label">Motion Chair · Bluetooth</div>
@@ -864,9 +864,9 @@ function toReynoldsTrack(pts){
     } else if (p.region === 'turbulent') {
       var intensity = Math.min(1.0, (p.stress - 4000) / 4000);
       // Ramps up to a MUCH faster rotation!
-      freqMult = 3.0 + intensity * 6.0; 
+      freqMult = 5.0 + intensity * 10.0; 
       // Keep some noise, but smooth it out
-      noiseAmp = 0.3 + intensity * 0.4; 
+      noiseAmp = 0.6 + intensity * 1.2; 
     }
     
     // Accumulate phase based on our frequency multiplier
@@ -874,8 +874,8 @@ function toReynoldsTrack(pts){
     phase += (Math.PI * 4 * freqMult) * dt;
 
     // Use lower frequency for flowNoise to reduce jitter
-    var x = Math.sin(phase) * (5 + noiseAmp) + flowNoise(t * 6) * noiseAmp;
-    var y = Math.cos(phase) * (4 + noiseAmp) + flowNoise(t * 8) * noiseAmp;
+    var x = Math.sin(phase) * (3 + noiseAmp) + flowNoise(t * 6) * noiseAmp;
+    var y = Math.cos(phase) * (2 + noiseAmp) + flowNoise(t * 8) * noiseAmp;
 
     return{
       x: x, y: y, z: z, bank: 0,
